@@ -46,6 +46,7 @@ void initWiFi() {
 }
 
 // TODO init server location in same way as wifi.
+// TODO persist config!
 void initConfig() {
   Serial.println("--- initConfig() start");
 
