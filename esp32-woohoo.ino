@@ -105,4 +105,10 @@ void setup() {
 }
 
 void loop() {
+  // TODO deep sleep
+  // TODO wake
+  // TODO measure
+  // TODO buffer?
+  // TODO connect wifi
+  // TODO send measurement(s?)
 }
