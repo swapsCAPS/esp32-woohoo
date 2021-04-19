@@ -4,9 +4,6 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-
-Adafruit_BME280 bme;
-
 #include "secret.h"
 
 #define SEALEVELPRESSURE_HPA 1013.00
@@ -14,9 +11,12 @@ Adafruit_BME280 bme;
 #define DATA_PIN 5
 #define CLOCK_PIN 13
 #define uS_TO_S_FACTOR 1000000
-#define TIME_TO_SLEEP  30
+#define TIME_TO_SLEEP  60
+#define I2C_SDA 21
+#define I2C_SCL 22
 
 CRGB leds[NUM_LEDS];
+Adafruit_BME280 bme;
 
 // Recommended delay time between reading from Bosch Sensortec
 unsigned long delayTime;
@@ -32,38 +32,30 @@ void setLED(uint32_t val) {
 void initWiFi() {
   Serial.println("-- initWiFi() start");
 
+  Serial.print("-- initWiFi() connecting to: ");
+  Serial.print(ssid);
+  Serial.print(" with ");
+  Serial.println(pass);
+
   WiFi.mode(WIFI_STA);
 
   uint8_t connStatus;
   while (connStatus != WL_CONNECTED) {
     WiFi.begin(ssid, pass);
 
-    Serial.print("-- initWiFi() trying to connect to ");
-    Serial.print(ssid);
-    Serial.print(" with ");
-    Serial.println(pass);
+    delay(2000);
 
     connStatus = WiFi.status();
-    for (uint8_t i = 0; i < 3; i++){
-      if (connStatus == WL_CONNECTED) { break; }
-
-      setLED(0x000000);
-      delay(2500);
-      setLED(0xFFFF00);
-      delay(2500);
-      connStatus = WiFi.status();
-      Serial.print("-- initWiFi() connection status: ");
-      Serial.println(connStatus);
-    }
-
     if (connStatus == WL_CONNECTED) { break; }
 
+    setLED(0xFF0000);
     Serial.println("-- initWiFi() connection failed, retrying...");
     WiFi.disconnect();
-    delay(1000);
+    delay(10000);
   }
 
   setLED(0x00FF00);
+  delay(500);
 
   Serial.print("-- Connected to ");
   Serial.print(ssid);
@@ -149,6 +141,13 @@ void print_wakeup_reason(){
 void measure() {
   Serial.println("-- measure() start");
 
+  setLED(0xFF00FF);
+
+  while(!bme.begin(0x76)) {
+    Serial.println("-- measure() bme.begin() failed");
+    delay(1000);
+  }
+
   bme.setSampling(
     Adafruit_BME280::MODE_FORCED,
     Adafruit_BME280::SAMPLING_X1, // temp
@@ -157,28 +156,25 @@ void measure() {
     Adafruit_BME280::FILTER_OFF
   );
 
-  while(!bme.begin(0x76)) {
-    Serial.println("-- measure() bme.begin() failed");
-    delay(1000);
-  }
-
   bme.takeForcedMeasurement();
-  /* Serial.print(bme.readTemperature()); */
-  /* Serial.print(","); */
-  /* Serial.print(bme.readHumidity() ); */
-  /* Serial.print(","); */
-  /* Serial.println(bme.readPressure()) ; */
+  Serial.print(bme.readTemperature());
+  Serial.print("°C ");
+  Serial.print(bme.readHumidity());
+  Serial.print("%, ");
+  Serial.print(bme.readPressure() / 100.0f, 2);
+  Serial.println("hPa");
+
+  FastLED.setBrightness(1); // Devices with overly bright LEDs suck!
+  setLED(0xFF0000);
 
   Serial.println("-- measure() finish");
 }
 
 void setup() {
-  Serial.begin(115200);
-  delay(1000);
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);  // GRB ordering is assumed
+  FastLED.setBrightness(4); // Devices with overly bright LEDs suck!
 
-  Serial.println("* setup() start");
-
-  Wire.begin();
+  Wire.begin(I2C_SDA, I2C_SCL);
 
   strcpy(ssid, DEFAULT_SSID);
   strcpy(pass, DEFAULT_PASSWORD);
@@ -187,10 +183,12 @@ void setup() {
 
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
 
-  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);  // GRB ordering is assumed
-  FastLED.setBrightness(8); // Devices with overly bright LEDs suck!
+  setLED(0xFF0000);
 
-  setLED(0x0FFFFF);
+  Serial.begin(115200);
+  delay(1000);
+
+  Serial.println("* setup() start");
 
   /* bool isConnected = initConnection(); */
 
@@ -206,9 +204,7 @@ void setup() {
 }
 
 void loop() {
-
-  // TODO measure
   // TODO buffer?
-  // TODO connect wifi
   // TODO send measurement(s?)
+  // TODO mqtt?
 }
