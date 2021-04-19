@@ -29,6 +29,15 @@ void setLED(uint32_t val) {
   FastLED.show();
 }
 
+void blinkDelay(uint16_t ival, uint8_t times, uint32_t color) {
+  for (uint8_t i = 0; i < times; i++) {
+    setLED(color);
+    delay(ival / 2);
+    setLED(0x000000);
+    delay(ival / 2);
+  }
+}
+
 void initWiFi() {
   Serial.println("-- initWiFi() start");
 
@@ -43,15 +52,14 @@ void initWiFi() {
   while (connStatus != WL_CONNECTED) {
     WiFi.begin(ssid, pass);
 
-    delay(2000);
+    blinkDelay(1000, 2, 0xFFFF00);
 
     connStatus = WiFi.status();
     if (connStatus == WL_CONNECTED) { break; }
 
-    setLED(0xFF0000);
     Serial.println("-- initWiFi() connection failed, retrying...");
     WiFi.disconnect();
-    delay(10000);
+    blinkDelay(1000, 10, 0xFF0000);
   }
 
   setLED(0x00FF00);
