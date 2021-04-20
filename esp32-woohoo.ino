@@ -25,9 +25,8 @@ unsigned long delayTime;
 char ssid[32];
 char pass[20];
 
-float temperature;
-float humidity;
-float pressure;
+char pubBuffie[22];
+char valBuffie[8];
 
 IPAddress broker(192,168,178,20); // IP address of your MQTT broker eg. 192.168.1.50
 WiFiClient wclient;
@@ -95,7 +94,7 @@ void initMQTT() {
   client.setServer(broker, 1883);
 
   while(!client.connected()) {
-    Serial.print("-- initMQTT() connecting...");
+    Serial.println("-- initMQTT() connecting...");
 
     if (client.connect("unique")) {
       Serial.println("-- initMQTT() connected");
@@ -201,20 +200,20 @@ void measure() {
   );
 
   bme.takeForcedMeasurement();
-  temperature = bme.readTemperature();
-  humidity = bme.readHumidity();
-  pressure = bme.readPressure() / 100.0f;
 
-  Serial.println("-- Temp     Humidity  Pressure");
+  dtostrf(bme.readTemperature(), 5, 2, valBuffie);
+  strcat(pubBuffie, valBuffie);
+  strcat(pubBuffie, ",");
+  dtostrf(bme.readHumidity(), 5, 2, valBuffie);
+  strcat(pubBuffie, valBuffie);
+  strcat(pubBuffie, ",");
+  dtostrf(bme.readPressure() / 100.0f, 7, 2, valBuffie);
+  strcat(pubBuffie, valBuffie);
+
   Serial.print("-- ");
-  Serial.print(temperature);
-  Serial.print("°C  ");
-  Serial.print(humidity);
-  Serial.print("%,   ");
-  Serial.print(pressure, 2);
-  Serial.println("hPa");
+  Serial.println(pubBuffie);
 
-  client.publish("sensors/thp", "hi!");
+  client.publish("sensors/thp", pubBuffie);
 
   FastLED.setBrightness(2); // Devices with overly bright LEDs suck!
   setLED(0xFF0000);
@@ -247,6 +246,8 @@ void setup() {
 
   initWiFi();
 
+  delay(1000);
+
   initMQTT();
 
   measure();
@@ -258,6 +259,5 @@ void setup() {
 }
 
 void loop() {
-  // TODO buffer?
-  // TODO send measurement(s?)
+  // TODO finish config setting
 }
