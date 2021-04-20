@@ -3,6 +3,7 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#include <PubSubClient.h>
 
 #include "secret.h"
 
@@ -23,6 +24,16 @@ unsigned long delayTime;
 
 char ssid[32];
 char pass[20];
+
+float temperature;
+float humidity;
+float pressure;
+
+IPAddress broker(192,168,178,20); // IP address of your MQTT broker eg. 192.168.1.50
+WiFiClient wclient;
+
+PubSubClient client(wclient); // Setup MQTT client
+bool state = 0;
 
 void setLED(uint32_t val) {
   leds[0] = val;
@@ -55,7 +66,10 @@ void initWiFi() {
     blinkDelay(1000, 2, 0xFFFF00);
 
     connStatus = WiFi.status();
-    if (connStatus == WL_CONNECTED) { break; }
+    if (connStatus == WL_CONNECTED) {
+      Serial.println("-- initWiFi() connected");
+      break;
+    }
 
     Serial.println("-- initWiFi() connection failed, retrying...");
     WiFi.disconnect();
@@ -75,8 +89,30 @@ void initWiFi() {
   Serial.println("-- initWiFi() finish");
 }
 
+void initMQTT() {
+  Serial.println("-- initMQTT() start");
+
+  client.setServer(broker, 1883);
+
+  while(!client.connected()) {
+    Serial.print("-- initMQTT() connecting...");
+
+    if (client.connect("unique")) {
+      Serial.println("-- initMQTT() connected");
+      break;
+    };
+
+    Serial.println("-- initMQTT() connection failed, retrying...");
+
+    blinkDelay(1000, 5, 0x00FFFF);
+  }
+
+  Serial.println("-- initMQTT() finish");
+}
+
 // TODO init server location in same way as wifi.
-// TODO persist config!
+// TODO init client id
+// TODO persist config in EEPROM
 void initConfig() {
   Serial.println("-- initConfig() start");
 
@@ -165,14 +201,22 @@ void measure() {
   );
 
   bme.takeForcedMeasurement();
-  Serial.print(bme.readTemperature());
-  Serial.print("°C ");
-  Serial.print(bme.readHumidity());
-  Serial.print("%, ");
-  Serial.print(bme.readPressure() / 100.0f, 2);
+  temperature = bme.readTemperature();
+  humidity = bme.readHumidity();
+  pressure = bme.readPressure() / 100.0f;
+
+  Serial.println("-- Temp     Humidity  Pressure");
+  Serial.print("-- ");
+  Serial.print(temperature);
+  Serial.print("°C  ");
+  Serial.print(humidity);
+  Serial.print("%,   ");
+  Serial.print(pressure, 2);
   Serial.println("hPa");
 
-  FastLED.setBrightness(1); // Devices with overly bright LEDs suck!
+  client.publish("sensors/thp", "hi!");
+
+  FastLED.setBrightness(2); // Devices with overly bright LEDs suck!
   setLED(0xFF0000);
 
   Serial.println("-- measure() finish");
@@ -194,7 +238,6 @@ void setup() {
   setLED(0xFF0000);
 
   Serial.begin(115200);
-  delay(1000);
 
   Serial.println("* setup() start");
 
@@ -203,6 +246,8 @@ void setup() {
   //initConfig();
 
   initWiFi();
+
+  initMQTT();
 
   measure();
 
@@ -214,5 +259,4 @@ void setup() {
 void loop() {
   // TODO buffer?
   // TODO send measurement(s?)
-  // TODO mqtt?
 }
