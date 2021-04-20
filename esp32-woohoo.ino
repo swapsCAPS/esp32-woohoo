@@ -260,4 +260,6 @@ void setup() {
 
 void loop() {
   // TODO finish config setting
+  // TODO fix publish not always working
+  // TODO implement MQTT ack / callback?
 }
