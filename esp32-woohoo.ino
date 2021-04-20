@@ -253,6 +253,7 @@ void setup() {
 
   Serial.println("* setup() finish");
 
+  WiFi.disconnect();
   esp_deep_sleep_start();
 }
 
