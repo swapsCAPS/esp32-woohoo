@@ -22,9 +22,12 @@ Adafruit_BME280 bme;
 // Recommended delay time between reading from Bosch Sensortec
 unsigned long delayTime;
 
+byte macAddress[6];
+
 char ssid[32];
 char pass[20];
 
+char topicBuffie[32];
 char pubBuffie[22];
 char valBuffie[8];
 
@@ -34,9 +37,33 @@ WiFiClient wclient;
 PubSubClient client(wclient); // Setup MQTT client
 bool state = 0;
 
+void array_to_string(byte array[], unsigned int len, char buffer[]) {
+  for (unsigned int i = 0; i < len; i++) {
+    byte nib1 = (array[i] >> 4) & 0x0F;
+    byte nib2 = (array[i] >> 0) & 0x0F;
+
+    uint8_t offset = i;
+
+    buffer[i*2+0] = nib1  < 0xA ? '0' + nib1  : 'A' + nib1  - 0xA;
+    buffer[i*2+1] = nib2  < 0xA ? '0' + nib2  : 'A' + nib2  - 0xA;
+
+    if (i == len - 1) { break; }
+
+    buffer[i*2+2] = ':';
+  }
+  buffer[len*2] = '\0';
+}
+
 void setLED(uint32_t val) {
   leds[0] = val;
   FastLED.show();
+}
+
+void setTopicBuffie() {
+  char buffie[18];
+  array_to_string(macAddress, 6, buffie);
+  strcat(topicBuffie, "sensors/thp/");
+  strcat(topicBuffie, buffie);
 }
 
 void blinkDelay(uint16_t ival, uint8_t times, uint32_t color) {
@@ -75,9 +102,6 @@ void initWiFi() {
     blinkDelay(1000, 10, 0xFF0000);
   }
 
-  setLED(0x00FF00);
-  delay(500);
-
   Serial.print("-- Connected to ");
   Serial.print(ssid);
   Serial.print(" with ");
@@ -85,6 +109,10 @@ void initWiFi() {
   Serial.print(", own ip: [");
   Serial.print(WiFi.localIP());
   Serial.println("]");
+
+  WiFi.macAddress(macAddress);
+  setTopicBuffie();
+
   Serial.println("-- initWiFi() finish");
 }
 
@@ -192,12 +220,12 @@ void measure() {
   }
 
   bme.setSampling(
-    Adafruit_BME280::MODE_FORCED,
-    Adafruit_BME280::SAMPLING_X1, // temp
-    Adafruit_BME280::SAMPLING_X1, // pressure
-    Adafruit_BME280::SAMPLING_X1, // humidity
-    Adafruit_BME280::FILTER_OFF
-  );
+      Adafruit_BME280::MODE_FORCED,
+      Adafruit_BME280::SAMPLING_X1, // temp
+      Adafruit_BME280::SAMPLING_X1, // pressure
+      Adafruit_BME280::SAMPLING_X1, // humidity
+      Adafruit_BME280::FILTER_OFF
+      );
 
   bme.takeForcedMeasurement();
 
@@ -213,10 +241,9 @@ void measure() {
   Serial.print("-- ");
   Serial.println(pubBuffie);
 
-  client.publish("sensors/thp", pubBuffie);
+  client.publish(topicBuffie, pubBuffie);
 
-  FastLED.setBrightness(2); // Devices with overly bright LEDs suck!
-  setLED(0xFF0000);
+  delay(500);
 
   Serial.println("-- measure() finish");
 }
@@ -246,11 +273,18 @@ void setup() {
 
   initWiFi();
 
-  delay(1000);
+  blinkDelay(500, 2, 0x00FF00);
 
-  initMQTT();
+  initMQTT();4
+
+  blinkDelay(250, 4, 0x00FF00);
 
   measure();
+
+  blinkDelay(250, 2, 0x00FF00);
+
+  FastLED.setBrightness(2); // Devices with overly bright LEDs suck!
+  setLED(0xFF0000);
 
   Serial.println("* setup() finish");
 
