@@ -69,6 +69,7 @@ fn main() {
     info!("Starting server...");
 
     for stream in listener.incoming() {
+        debug!("Request received");
         let mut stream: TcpStream = stream.unwrap();
 
         let mut req = [0; 1024];

@@ -1,3 +1,6 @@
+run-pi-debug:
+	RUST_LOG=debug TCP_BIND_ADDR=192.168.178.20:19090 ./bin/mqtt-to-prom_aarch64-unknown-linux-gnu
+
 run-pi:
 	RUST_LOG=info TCP_BIND_ADDR=192.168.178.20:19090 ./bin/mqtt-to-prom_aarch64-unknown-linux-gnu
 
