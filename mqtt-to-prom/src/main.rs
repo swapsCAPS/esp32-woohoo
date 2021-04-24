@@ -2,6 +2,9 @@
 extern crate prometheus;
 #[macro_use]
 extern crate lazy_static;
+#[macro_use]
+extern crate log;
+extern crate pretty_env_logger;
 
 use prometheus::{Encoder, GaugeVec, TextEncoder};
 use rumqttc::{Client, Event, Incoming, MqttOptions, QoS};
@@ -21,13 +24,14 @@ lazy_static! {
 }
 
 fn main() {
-    println!("Starting mqtt thread...");
+    pretty_env_logger::init();
+    info!("Starting mqtt thread...");
 
     let mqtt_host = env::var("MQTT_HOST").unwrap_or(String::from("localhost"));
     let bind_address = env::var("TCP_BIND_ADDR").unwrap_or(String::from("localhost:19090"));
 
-    println!("mqtt_host {}", mqtt_host);
-    println!("bind_address {}", bind_address);
+    info!("mqtt_host {}", mqtt_host);
+    info!("bind_address {}", bind_address);
 
     thread::spawn(|| {
         let mut mqttoptions = MqttOptions::new("esp32-server", mqtt_host, 1883);
@@ -38,6 +42,7 @@ fn main() {
 
         // Iterate to poll the eventloop for connection progress
         for (_, notification) in connection.iter().enumerate() {
+            debug!("Received {:?}", notification);
             if let Ok(Event::Incoming(Incoming::Publish(p))) = notification {
                 let mac = p.topic.split("/").last().unwrap();
                 let payload = str::from_utf8(&p.payload).unwrap();
@@ -61,7 +66,7 @@ fn main() {
 
     let listener = TcpListener::bind(bind_address).unwrap();
 
-    println!("Starting server...");
+    info!("Starting server...");
 
     for stream in listener.incoming() {
         let mut stream: TcpStream = stream.unwrap();
