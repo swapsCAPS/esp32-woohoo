@@ -1,6 +1,3 @@
-run-pi-debug:
-	RUST_LOG=debug TCP_BIND_ADDR=192.168.178.20:19090 ./bin/mqtt-to-prom_aarch64-unknown-linux-gnu
-
 run-pi:
 	RUST_LOG=info TCP_BIND_ADDR=192.168.178.20:19090 ./bin/mqtt-to-prom_aarch64-unknown-linux-gnu
 
@@ -10,3 +7,6 @@ build:
 
 install-pi:
 	cp bin/mqtt-to-prom_aarch64-unknown-linux-gnu /usr/bin/mqtt-to-prom
+	cp meta/mqtt-to-prom.service /etc/systemd/system/.
+	systemctl enable mqtt-to-prom
+	systemctl start mqtt-to-prom
