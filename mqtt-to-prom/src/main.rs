@@ -5,6 +5,7 @@ extern crate lazy_static;
 
 use prometheus::{Encoder, GaugeVec, TextEncoder};
 use rumqttc::{Client, Event, Incoming, MqttOptions, QoS};
+use std::env;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 use std::str;
@@ -20,8 +21,16 @@ lazy_static! {
 }
 
 fn main() {
+    println!("Starting mqtt thread...");
+
+    let mqtt_host = env::var("MQTT_HOST").unwrap_or(String::from("localhost"));
+    let bind_address = env::var("TCP_BIND_ADDR").unwrap_or(String::from("localhost:19090"));
+
+    println!("mqtt_host {}", mqtt_host);
+    println!("bind_address {}", bind_address);
+
     thread::spawn(|| {
-        let mut mqttoptions = MqttOptions::new("esp32-server", "192.168.178.20", 1883);
+        let mut mqttoptions = MqttOptions::new("esp32-server", mqtt_host, 1883);
         mqttoptions.set_keep_alive(5);
 
         let (mut client, mut connection) = Client::new(mqttoptions, 10);
@@ -50,7 +59,9 @@ fn main() {
         }
     });
 
-    let listener = TcpListener::bind("127.0.0.1:19090").unwrap();
+    let listener = TcpListener::bind(bind_address).unwrap();
+
+    println!("Starting server...");
 
     for stream in listener.incoming() {
         let mut stream: TcpStream = stream.unwrap();
