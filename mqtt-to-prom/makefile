@@ -3,6 +3,7 @@ run-pi:
 
 build:
 	TARGET_CC=aarch64-none-linux-gnu-gcc cargo build --target=aarch64-unknown-linux-gnu --release
+	cp target/aarch64-unknown-linux-gnu/release/mqtt-to-prom bin/mqtt-to-prom_aarch64-unknown-linux-gnu
 
 install-pi:
 	cp bin/mqtt-to-prom_aarch64-unknown-linux-gnu /usr/bin/mqtt-to-prom

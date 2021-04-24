@@ -71,6 +71,12 @@ fn main() {
     for stream in listener.incoming() {
         let mut stream: TcpStream = stream.unwrap();
 
+        let mut req = [0; 1024];
+
+        stream.read(&mut req).unwrap();
+
+        debug!("req: {}", String::from_utf8_lossy(&req[..]));
+
         let mut buffer = vec![];
         let encoder = TextEncoder::new();
         let metric_families = prometheus::gather();
