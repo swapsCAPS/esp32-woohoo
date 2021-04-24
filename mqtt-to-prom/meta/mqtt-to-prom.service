@@ -1,0 +1,9 @@
+[Unit]
+Description=mqtt to prometheus
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/mqtt-to-prom
+
+[Install]
+WantedBy=multi-user.target
