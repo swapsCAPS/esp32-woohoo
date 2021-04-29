@@ -52,13 +52,13 @@ fn main() {
                 if let [temperature, humidity, pressure] = &split[..] {
                     TEMPERATURE_GAUGE
                         .with_label_values(&[mac])
-                        .set(temperature.parse::<f64>().unwrap());
+                        .set(temperature.trim().parse::<f64>().unwrap());
                     HUMIDITY_GAUGE
                         .with_label_values(&[mac])
-                        .set(humidity.parse::<f64>().unwrap());
+                        .set(humidity.trim().parse::<f64>().unwrap());
                     PRESSURE_GAUGE
                         .with_label_values(&[mac])
-                        .set(pressure.parse::<f64>().unwrap());
+                        .set(pressure.trim().parse::<f64>().unwrap());
                 }
             }
         }
