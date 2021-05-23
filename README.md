@@ -10,8 +10,12 @@ Simple rust mqtt scraper to expose prometheus metrics.
 Code can be found in `./mqtt-to-prom`
 
 ## TODO
-- [ ] [bugfix] parsing float goes wrong sometimes, write some tests
+- [x] [bugfix] parsing float goes wrong sometimes, write some tests
+  - [ ] test this
 - [x] Grafana dashboard
+- [ ] NTP server call
+- [ ] Send out time stamps
+- [ ] Add last will on connect()
 - [ ] Auto config server. Loop over serial ports, check for devices and flash config to them.
   - [ ] Auto config server
   - [ ] Use EEPROM to store wifi credentials, broker location, etc.

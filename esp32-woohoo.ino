@@ -27,6 +27,7 @@ byte macAddress[6];
 char ssid[32];
 char pass[20];
 
+char macAddressStrArr[18];
 char topicBuffie[32];
 char pubBuffie[22];
 char valBuffie[8];
@@ -59,11 +60,13 @@ void setLED(uint32_t val) {
   FastLED.show();
 }
 
+void setMacAddressStr() {
+  array_to_string(macAddress, 6, macAddressStrArr);
+}
+
 void setTopicBuffie() {
-  char buffie[18];
-  array_to_string(macAddress, 6, buffie);
   strcat(topicBuffie, "sensors/thp/");
-  strcat(topicBuffie, buffie);
+  strcat(topicBuffie, macAddressStrArr);
 }
 
 void blinkDelay(uint16_t ival, uint8_t times, uint32_t color) {
@@ -111,6 +114,7 @@ void initWiFi() {
   Serial.println("]");
 
   WiFi.macAddress(macAddress);
+  setMacAddressStr();
   setTopicBuffie();
 
   Serial.println("-- initWiFi() finish");
@@ -124,7 +128,7 @@ void initMQTT() {
   while(!client.connected()) {
     Serial.println("-- initMQTT() connecting...");
 
-    if (client.connect("unique")) {
+    if (client.connect(macAddressStrArr)) {
       Serial.println("-- initMQTT() connected");
       break;
     };
@@ -275,7 +279,7 @@ void setup() {
 
   blinkDelay(500, 2, 0x00FF00);
 
-  initMQTT();4
+  initMQTT();
 
   blinkDelay(250, 4, 0x00FF00);
 
@@ -288,6 +292,7 @@ void setup() {
 
   Serial.println("* setup() finish");
 
+  client.disconnect();
   WiFi.disconnect();
   esp_deep_sleep_start();
 }
