@@ -14,8 +14,14 @@ Code can be found in `./mqtt-to-prom`
   - [ ] test this
 - [x] Grafana dashboard
 - [ ] NTP server call
+- [ ] Improve battery life
+    - [ ] Read out SoC (on A0?)
+    - [ ] Reduce/disable LED on time
+    - [ ] Reduce amount of measurements taken, i.e. increase sleep time
+    - [ ] If possible light up when battery too low
 - [ ] Send out time stamps
-- [ ] Add last will on connect()
+- [x] Add last will on connect()
+    - [ ] Decided to skip this for now. Will do server side most likely.
 - [ ] Auto config server. Loop over serial ports, check for devices and flash config to them.
   - [ ] Auto config server
   - [ ] Use EEPROM to store wifi credentials, broker location, etc.
