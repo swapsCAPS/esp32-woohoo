@@ -21,6 +21,8 @@ lazy_static! {
         register_gauge_vec!("esp32_humidity", "Humidity", &["mac"]).unwrap();
     static ref PRESSURE_GAUGE: GaugeVec =
         register_gauge_vec!("esp32_pressure", "Pressure", &["mac"]).unwrap();
+    static ref BATTERY_LEVEL: GaugeVec =
+        register_gauge_vec!("esp32_bat_lvl", "Battery level", &["mac"]).unwrap();
 }
 
 fn main() {
@@ -49,7 +51,7 @@ fn main() {
 
                 let split: Vec<&str> = payload.split(",").collect();
 
-                if let [temperature, humidity, pressure] = &split[..] {
+                if let [temperature, humidity, pressure, bat_lvl] = &split[..] {
                     TEMPERATURE_GAUGE
                         .with_label_values(&[mac])
                         .set(temperature.trim().parse::<f64>().unwrap());
@@ -59,6 +61,9 @@ fn main() {
                     PRESSURE_GAUGE
                         .with_label_values(&[mac])
                         .set(pressure.trim().parse::<f64>().unwrap());
+                    BATTERY_LEVEL
+                        .with_label_values(&[mac])
+                        .set(bat_lvl.trim().parse::<f64>().unwrap());
                 }
             }
         }

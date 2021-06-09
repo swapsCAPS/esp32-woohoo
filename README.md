@@ -14,12 +14,13 @@ Code can be found in `./mqtt-to-prom`
   - [ ] test this
 - [x] Grafana dashboard
 - [ ] NTP server call
+- [ ] Send out time stamps
 - [ ] Improve battery life
-    - [ ] Read out SoC (on A0?)
-    - [ ] Reduce/disable LED on time
+    - [x] Read out SoC (on A0?)
+      - [x] Using voltage divider (10KΩ + 20KΩ)
+    - [x] Reduce/disable LED on time
     - [ ] Reduce amount of measurements taken, i.e. increase sleep time
     - [ ] If possible light up when battery too low
-- [ ] Send out time stamps
 - [x] Add last will on connect()
     - [ ] Decided to skip this for now. Will do server side most likely.
 - [ ] Auto config server. Loop over serial ports, check for devices and flash config to them.
