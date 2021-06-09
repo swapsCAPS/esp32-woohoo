@@ -19,6 +19,10 @@
 CRGB leds[NUM_LEDS];
 Adafruit_BME280 bme;
 
+// Hooked up using voltage divider
+// In this case using 10K and 22K resistors I had laying around
+int batteryLevelPin = A0;
+
 // Recommended delay time between reading from Bosch Sensortec
 unsigned long delayTime;
 
@@ -29,7 +33,7 @@ char pass[20];
 
 char macAddressStrArr[18];
 char topicBuffie[32];
-char pubBuffie[22];
+char pubBuffie[27];
 char valBuffie[8];
 
 IPAddress broker(192,168,178,20); // IP address of your MQTT broker eg. 192.168.1.50
@@ -92,7 +96,8 @@ void initWiFi() {
   while (connStatus != WL_CONNECTED) {
     WiFi.begin(ssid, pass);
 
-    blinkDelay(1000, 2, 0xFFFF00);
+    /* blinkDelay(1000, 2, 0xFFFF00); */
+    delay(2000);
 
     connStatus = WiFi.status();
     if (connStatus == WL_CONNECTED) {
@@ -102,7 +107,8 @@ void initWiFi() {
 
     Serial.println("-- initWiFi() connection failed, retrying...");
     WiFi.disconnect();
-    blinkDelay(1000, 10, 0xFF0000);
+    /* blinkDelay(1000, 10, 0xFF0000); */
+    delay(10000);
   }
 
   Serial.print("-- Connected to ");
@@ -135,7 +141,8 @@ void initMQTT() {
 
     Serial.println("-- initMQTT() connection failed, retrying...");
 
-    blinkDelay(1000, 5, 0x00FFFF);
+    /* blinkDelay(1000, 5, 0x00FFFF); */
+    delay(5000);
   }
 
   Serial.println("-- initMQTT() finish");
@@ -216,7 +223,7 @@ void print_wakeup_reason(){
 void measure() {
   Serial.println("-- measure() start");
 
-  setLED(0xFF00FF);
+  /* setLED(0xFF00FF); */
 
   while(!bme.begin(0x76)) {
     Serial.println("-- measure() bme.begin() failed");
@@ -240,6 +247,9 @@ void measure() {
   strcat(pubBuffie, valBuffie);
   strcat(pubBuffie, ",");
   dtostrf(bme.readPressure() / 100.0f, 7, 2, valBuffie);
+  strcat(pubBuffie, valBuffie);
+  strcat(pubBuffie, ",");
+  itoa(analogRead(batteryLevelPin), valBuffie, 10);
   strcat(pubBuffie, valBuffie);
 
   Serial.print("-- ");
@@ -265,7 +275,7 @@ void setup() {
 
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
 
-  setLED(0xFF0000);
+  /* setLED(0xFF0000); */
 
   Serial.begin(115200);
 
@@ -277,18 +287,21 @@ void setup() {
 
   initWiFi();
 
-  blinkDelay(500, 2, 0x00FF00);
+  /* blinkDelay(500, 2, 0x00FF00); */
+  delay(1000);
 
   initMQTT();
 
-  blinkDelay(250, 4, 0x00FF00);
+  /* blinkDelay(250, 4, 0x00FF00); */
+  delay(1000);
 
   measure();
 
-  blinkDelay(250, 2, 0x00FF00);
+  /* blinkDelay(250, 2, 0x00FF00); */
+  delay(1000);
 
-  FastLED.setBrightness(2); // Devices with overly bright LEDs suck!
-  setLED(0xFF0000);
+  /* FastLED.setBrightness(2); // Devices with overly bright LEDs suck! */
+  /* setLED(0xFF0000); */
 
   Serial.println("* setup() finish");
 
