@@ -54,16 +54,16 @@ fn main() {
                 if let [temperature, humidity, pressure, bat_lvl] = &split[..] {
                     TEMPERATURE_GAUGE
                         .with_label_values(&[mac])
-                        .set(temperature.trim().parse::<f64>().unwrap());
+                        .set(temperature.trim().parse::<f64>().expect(&format!("Could not parse temp with [ {} ]", payload)));
                     HUMIDITY_GAUGE
                         .with_label_values(&[mac])
-                        .set(humidity.trim().parse::<f64>().unwrap());
+                        .set(humidity.trim().parse::<f64>().expect(&format!("Could not parse humidity with [ {} ]", payload)));
                     PRESSURE_GAUGE
                         .with_label_values(&[mac])
-                        .set(pressure.trim().parse::<f64>().unwrap());
+                        .set(pressure.trim().parse::<f64>().expect(&format!("Could not parse pressure with [ {} ]", payload)));
                     BATTERY_LEVEL
                         .with_label_values(&[mac])
-                        .set(bat_lvl.trim().parse::<f64>().unwrap());
+                        .set(bat_lvl.trim().parse::<f64>().expect(&format!("Could not parse battery level with [ {} ]", payload)));
                 }
             }
         }
