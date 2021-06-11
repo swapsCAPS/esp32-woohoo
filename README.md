@@ -11,7 +11,9 @@ Code can be found in `./mqtt-to-prom`
 
 ## TODO
 - [x] [bugfix] parsing float goes wrong sometimes, write some tests
-  - [ ] test this
+  - [x] test this
+  - [x] output payload on parse error
+  - [ ] check if happens again
 - [x] Grafana dashboard
 - [ ] NTP server call
 - [ ] Send out time stamps
