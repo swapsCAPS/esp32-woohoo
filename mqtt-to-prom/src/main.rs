@@ -72,7 +72,7 @@ fn main() {
                         .set((humidity * 4.0).round() / 4.0);
                     PRESSURE_GAUGE
                         .with_label_values(&[mac])
-                        .set((pressure * 4.0) / 4.0);
+                        .set((pressure * 4.0).round() / 4.0);
                     BATTERY_LEVEL
                         .with_label_values(&[mac])
                         .set(bat_lvl);
