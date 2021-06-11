@@ -10,6 +10,7 @@ Simple rust mqtt scraper to expose prometheus metrics.
 Code can be found in `./mqtt-to-prom`
 
 ## TODO
+- [x] Round values to eliminate "noise"
 - [x] [bugfix] parsing float goes wrong sometimes, write some tests
   - [x] test this
   - [x] output payload on parse error
