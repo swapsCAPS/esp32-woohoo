@@ -9,6 +9,17 @@ Code can be found in `./esp32-woohoo.ino`
 Simple rust mqtt scraper to expose prometheus metrics.
 Code can be found in `./mqtt-to-prom`
 
+### Build
+
+#### esp32-woohoo.ino
+Use Arduino IDE
+
+#### mqtt-to-prom
+If running on raspberry pi 4 with aarch64 run:
+```bash
+make build-pi
+```
+
 ## TODO
 - [x] Round values to eliminate "noise"
 - [x] [bugfix] parsing float goes wrong sometimes, write some tests
