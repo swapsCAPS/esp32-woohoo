@@ -6,6 +6,7 @@ build-pi:
 	cp target/aarch64-unknown-linux-gnu/release/mqtt-to-prom bin/mqtt-to-prom_aarch64-unknown-linux-gnu
 
 install-pi:
+	systemctl stop mqtt-to-prom
 	cp bin/mqtt-to-prom_aarch64-unknown-linux-gnu /usr/bin/mqtt-to-prom
 	cp meta/mqtt-to-prom.service /etc/systemd/system/.
 	systemctl enable mqtt-to-prom
