@@ -19,6 +19,75 @@
   "links": [],
   "panels": [
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 30,
+          "min": 15,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 22
+              },
+              {
+                "color": "#EAB839",
+                "value": 25
+              },
+              {
+                "color": "red",
+                "value": 27
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 0,
+        "y": 0
+      },
+      "id": 7,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "text": {}
+      },
+      "pluginVersion": "7.5.4",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "esp32_temperature",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{mac}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Temperature",
+      "type": "gauge"
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -32,8 +101,8 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 24,
-        "x": 0,
+        "w": 17,
+        "x": 7,
         "y": 0
       },
       "hiddenSeries": false,
@@ -41,12 +110,12 @@
       "legend": {
         "alignAsTable": true,
         "avg": true,
-        "current": true,
+        "current": false,
         "max": false,
         "min": false,
         "rightSide": true,
         "show": true,
-        "sideWidth": 290,
+        "sideWidth": 210,
         "total": false,
         "values": true
       },
@@ -69,9 +138,10 @@
         {
           "exemplar": true,
           "expr": "esp32_temperature",
+          "hide": false,
           "interval": "",
           "legendFormat": "{{mac}}",
-          "refId": "A"
+          "refId": "B"
         }
       ],
       "thresholds": [],
@@ -119,6 +189,79 @@
       }
     },
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 25
+              },
+              {
+                "color": "green",
+                "value": 30
+              },
+              {
+                "color": "orange",
+                "value": 60
+              },
+              {
+                "color": "red",
+                "value": 70
+              }
+            ]
+          },
+          "unit": "humidity"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 0,
+        "y": 8
+      },
+      "id": 8,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "text": {}
+      },
+      "pluginVersion": "7.5.4",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "esp32_humidity",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{mac}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Humidity",
+      "type": "gauge"
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -133,8 +276,8 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 24,
-        "x": 0,
+        "w": 17,
+        "x": 7,
         "y": 8
       },
       "hiddenSeries": false,
@@ -142,12 +285,12 @@
       "legend": {
         "alignAsTable": true,
         "avg": true,
-        "current": true,
+        "current": false,
         "max": false,
         "min": false,
         "rightSide": true,
         "show": true,
-        "sideWidth": 290,
+        "sideWidth": 210,
         "total": false,
         "values": true
       },
@@ -169,10 +312,19 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "esp32_humidity",
-          "interval": "",
+          "expr": "holt_winters(esp32_humidity[6h], 0.09, 0.02)",
+          "hide": false,
+          "interval": "5m",
           "legendFormat": "{{mac}}",
           "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_humidity",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "raw {{mac}}",
+          "refId": "B"
         }
       ],
       "thresholds": [],
@@ -200,8 +352,8 @@
           "format": "humidity",
           "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
+          "max": "80",
+          "min": "20",
           "show": true
         },
         {
@@ -220,6 +372,63 @@
       }
     },
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 1050,
+          "min": 950,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "pressurehpa"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 0,
+        "y": 16
+      },
+      "id": 10,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "text": {}
+      },
+      "pluginVersion": "7.5.4",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "esp32_pressure",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{mac}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Pressure",
+      "type": "gauge"
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -234,8 +443,8 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 24,
-        "x": 0,
+        "w": 17,
+        "x": 7,
         "y": 16
       },
       "hiddenSeries": false,
@@ -243,12 +452,12 @@
       "legend": {
         "alignAsTable": true,
         "avg": true,
-        "current": true,
+        "current": false,
         "max": false,
         "min": false,
         "rightSide": true,
         "show": true,
-        "sideWidth": 290,
+        "sideWidth": 210,
         "total": false,
         "values": true
       },
@@ -270,10 +479,18 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "esp32_pressure",
+          "expr": "holt_winters(esp32_pressure[6h], 0.09, 0.02)",
           "interval": "",
           "legendFormat": "{{mac}}",
           "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_pressure",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "raw {{mac}}",
+          "refId": "B"
         }
       ],
       "thresholds": [],
@@ -301,8 +518,8 @@
           "format": "pressurehpa",
           "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
+          "max": "1050",
+          "min": "950",
           "show": true
         },
         {
@@ -321,6 +538,76 @@
       }
     },
     {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 4096,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1000
+              },
+              {
+                "color": "light-green",
+                "value": 1500
+              },
+              {
+                "color": "light-blue",
+                "value": 3000
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 0,
+        "y": 24
+      },
+      "id": 9,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "text": {}
+      },
+      "pluginVersion": "7.5.4",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "esp32_bat_lvl",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{mac}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Battery level",
+      "type": "gauge"
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -335,8 +622,8 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 24,
-        "x": 0,
+        "w": 17,
+        "x": 7,
         "y": 24
       },
       "hiddenSeries": false,
@@ -344,12 +631,12 @@
       "legend": {
         "alignAsTable": true,
         "avg": true,
-        "current": true,
+        "current": false,
         "max": false,
         "min": false,
         "rightSide": true,
         "show": true,
-        "sideWidth": 290,
+        "sideWidth": 210,
         "total": false,
         "values": true
       },
@@ -372,7 +659,7 @@
         {
           "exemplar": true,
           "expr": "esp32_bat_lvl",
-          "interval": "",
+          "interval": "1h",
           "legendFormat": "{{mac}}",
           "refId": "A"
         }
@@ -431,12 +718,12 @@
     "list": []
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "esp32s",
   "uid": "2ztBY7rGk",
-  "version": 21
+  "version": 38
 }

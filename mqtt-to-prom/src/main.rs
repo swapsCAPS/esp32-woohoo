@@ -52,30 +52,36 @@ fn main() {
                 let split: Vec<&str> = payload.split(",").collect();
 
                 if let [t, h, p, b] = &split[..] {
-                    let temperature: f64 = t.trim().parse()
+                    let temperature: f64 = t
+                        .trim()
+                        .parse()
                         .expect(&format!("Could not parse temp with [ {} ]", payload));
 
-                    let humidity: f64  = h.trim().parse()
+                    let humidity: f64 = h
+                        .trim()
+                        .parse()
                         .expect(&format!("Could not parse humidity with [ {} ]", payload));
 
-                    let pressure: f64  = p.trim().parse()
+                    let pressure: f64 = p
+                        .trim()
+                        .parse()
                         .expect(&format!("Could not parse pressure with [ {} ]", payload));
 
-                    let bat_lvl: f64  = b.trim().parse()
-                        .expect(&format!("Could not parse battery level with [ {} ]", payload));
+                    let bat_lvl: f64 = b.trim().parse().expect(&format!(
+                        "Could not parse battery level with [ {} ]",
+                        payload
+                    ));
 
                     TEMPERATURE_GAUGE
                         .with_label_values(&[mac])
-                        .set((temperature * 2.0).round() / 2.0);
+                        .set((temperature * 4.0).round() / 4.0);
                     HUMIDITY_GAUGE
                         .with_label_values(&[mac])
                         .set((humidity * 4.0).round() / 4.0);
                     PRESSURE_GAUGE
                         .with_label_values(&[mac])
                         .set((pressure * 4.0).round() / 4.0);
-                    BATTERY_LEVEL
-                        .with_label_values(&[mac])
-                        .set(bat_lvl);
+                    BATTERY_LEVEL.with_label_values(&[mac]).set(bat_lvl);
                 }
             }
         }
