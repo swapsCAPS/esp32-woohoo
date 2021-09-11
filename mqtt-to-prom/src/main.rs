@@ -52,36 +52,35 @@ fn main() {
                 let split: Vec<&str> = payload.split(",").collect();
 
                 if let [t, h, p, b] = &split[..] {
-                    let temperature: f64 = t
-                        .trim()
-                        .parse()
-                        .expect(&format!("Could not parse temp with [ {} ]", payload));
+                    if let Ok(temperature) = t.trim().parse::<f64>() {
+                        TEMPERATURE_GAUGE
+                            .with_label_values(&[mac])
+                            .set((temperature * 4.0).round() / 4.0);
+                    } else {
+                        println!("Could not parse temp from {}", payload)
+                    }
 
-                    let humidity: f64 = h
-                        .trim()
-                        .parse()
-                        .expect(&format!("Could not parse humidity with [ {} ]", payload));
+                    if let Ok(humidity) = h.trim().parse::<f64>() {
+                        HUMIDITY_GAUGE
+                            .with_label_values(&[mac])
+                            .set((humidity * 4.0).round() / 4.0);
+                    } else {
+                        println!("Could not parse humidity from {}", payload)
+                    }
 
-                    let pressure: f64 = p
-                        .trim()
-                        .parse()
-                        .expect(&format!("Could not parse pressure with [ {} ]", payload));
+                    if let Ok(pressure) = p.trim().parse::<f64>() {
+                        PRESSURE_GAUGE
+                            .with_label_values(&[mac])
+                            .set((pressure * 4.0).round() / 4.0);
+                    } else {
+                        println!("Could not parse pressure from {}", payload)
+                    }
 
-                    let bat_lvl: f64 = b.trim().parse().expect(&format!(
-                        "Could not parse battery level with [ {} ]",
-                        payload
-                    ));
-
-                    TEMPERATURE_GAUGE
-                        .with_label_values(&[mac])
-                        .set((temperature * 4.0).round() / 4.0);
-                    HUMIDITY_GAUGE
-                        .with_label_values(&[mac])
-                        .set((humidity * 4.0).round() / 4.0);
-                    PRESSURE_GAUGE
-                        .with_label_values(&[mac])
-                        .set((pressure * 4.0).round() / 4.0);
-                    BATTERY_LEVEL.with_label_values(&[mac]).set(bat_lvl);
+                    if let Ok(bat_lvl) = b.trim().parse::<f64>() {
+                        BATTERY_LEVEL.with_label_values(&[mac]).set(bat_lvl);
+                    } else {
+                        println!("Could not parse bat_lvl from {}", payload)
+                    }
                 }
             }
         }
