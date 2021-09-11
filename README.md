@@ -33,7 +33,8 @@ make build-pi
     - [x] Read out SoC (on A0?)
       - [x] Using voltage divider (10KΩ + 20KΩ)
     - [x] Reduce/disable LED on time
-    - [ ] Reduce amount of measurements taken, i.e. increase sleep time
+    - [x] Reduce amount of measurements taken, i.e. increase sleep time
+    - [ ] Get better idea of battery level percentage (0-4096 but cuts out at 2000 or smth)
     - [ ] If possible light up when battery too low
 - [x] Add last will on connect()
     - [ ] Decided to skip this for now. Will do server side most likely.

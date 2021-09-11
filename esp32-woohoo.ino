@@ -12,7 +12,7 @@
 #define DATA_PIN 5
 #define CLOCK_PIN 13
 #define uS_TO_S_FACTOR 1000000
-#define TIME_TO_SLEEP  60 // TODO increase me
+#define TIME_TO_SLEEP  5 * 60 // TODO increase me
 #define I2C_SDA 21
 #define I2C_SCL 22
 
