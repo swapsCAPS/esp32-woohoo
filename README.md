@@ -15,6 +15,10 @@ Code can be found in `./mqtt-to-prom`
 Use Arduino IDE
 
 #### mqtt-to-prom
+Make sure ![cross](https://github.com/rust-embedded/cross) is installed
+```
+cargo install cross
+```
 If running on raspberry pi 4 with aarch64 run:
 ```bash
 make build-pi
