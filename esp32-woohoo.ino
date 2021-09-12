@@ -111,7 +111,7 @@ void initWiFi() {
     delay(10000);
   }
 
-  Serial.print("-- Connected to ");
+  Serial.print("-- initWiFi() connected to ");
   Serial.print(ssid);
   Serial.print(" with ");
   Serial.print(pass);
@@ -252,7 +252,7 @@ void measure() {
   itoa(analogRead(batteryLevelPin), valBuffie, 10);
   strcat(pubBuffie, valBuffie);
 
-  Serial.print("-- ");
+  Serial.print("-- measure() publishing: ");
   Serial.println(pubBuffie);
 
   client.publish(topicBuffie, pubBuffie);
