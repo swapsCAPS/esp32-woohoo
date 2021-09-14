@@ -35,6 +35,8 @@ fn main() {
     info!("mqtt_host {}", mqtt_host);
     info!("bind_address {}", bind_address);
 
+    warn!("test");
+
     thread::spawn(|| {
         let mut mqttoptions = MqttOptions::new("esp32-server", mqtt_host, 1883);
         mqttoptions.set_keep_alive(5);
