@@ -35,8 +35,6 @@ fn main() {
     info!("mqtt_host {}", mqtt_host);
     info!("bind_address {}", bind_address);
 
-    warn!("test");
-
     thread::spawn(|| {
         let mut mqttoptions = MqttOptions::new("esp32-server", mqtt_host, 1883);
         mqttoptions.set_keep_alive(5);
@@ -59,7 +57,7 @@ fn main() {
                             .with_label_values(&[mac])
                             .set((temperature * 4.0).round() / 4.0);
                     } else {
-                        warn!("Could not parse temp from {}", payload)
+                        warn!("Could not parse temp from {}", payload);
                     }
 
                     if let Ok(humidity) = h.trim().parse::<f64>() {
@@ -67,7 +65,7 @@ fn main() {
                             .with_label_values(&[mac])
                             .set((humidity * 4.0).round() / 4.0);
                     } else {
-                        warn!("Could not parse humidity from {}", payload)
+                        warn!("Could not parse humidity from {}", payload);
                     }
 
                     if let Ok(pressure) = p.trim().parse::<f64>() {
@@ -75,14 +73,16 @@ fn main() {
                             .with_label_values(&[mac])
                             .set((pressure * 4.0).round() / 4.0);
                     } else {
-                        warn!("Could not parse pressure from {}", payload)
+                        warn!("Could not parse pressure from {}", payload);
                     }
 
                     if let Ok(bat_lvl) = b.trim().parse::<f64>() {
                         BATTERY_LEVEL.with_label_values(&[mac]).set(bat_lvl);
                     } else {
-                        warn!("Could not parse bat_lvl from {}", payload)
+                        warn!("Could not parse bat_lvl from {}", payload);
                     }
+                } else {
+                    warn!("Could not split payload from {}", payload);
                 }
             }
         }
