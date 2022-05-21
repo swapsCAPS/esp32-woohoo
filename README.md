@@ -25,10 +25,10 @@ Dependencies:
 - Adafruit_Sensor
 - Adafruit_BME280
 - PubSubClient by Nick O'Leary
-- Add an ![additional board](https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json) to Arduino IDE -> File -> Preferences
+- In Arduino IDE -> File -> Preferences -> Additional Boards Manager URLs, add: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
 
 #### mqtt-to-prom
-Make sure ![cross](https://github.com/rust-embedded/cross) is installed
+Make sure [cross](https://github.com/rust-embedded/cross) is installed
 ```
 cargo install cross
 ```
@@ -46,13 +46,16 @@ make build-pi
 - [x] Grafana dashboard
 - [ ] NTP server call
 - [ ] Send out time stamps
+- [ ] Blink on connection failures?
+  - [ ] Needs some experimentation, might substantially reduce batter life
 - [ ] Improve battery life
-    - [x] Read out SoC (on A0?)
-      - [x] Using voltage divider (10KΩ + 20KΩ)
-    - [x] Reduce/disable LED on time
-    - [x] Reduce amount of measurements taken, i.e. increase sleep time
-    - [ ] Get better idea of battery level percentage (0-4096 but cuts out at 2000 or smth)
-    - [ ] If possible light up when battery too low
+  - [x] Read out SoC (on A0?)
+    - [x] Using voltage divider (10KΩ + 20KΩ)
+  - [x] Reduce/disable LED on time
+  - [x] Reduce amount of measurements taken, i.e. increase sleep time
+  - [ ] Go back to deep sleep after several connection failures
+  - [ ] Get better idea of battery level percentage (0-4096 but cuts out at 2000 or smth)
+  - [ ] If possible light up when battery too low
 - [x] Add last will on connect()
     - [ ] Decided to skip this for now. Will do server side most likely.
 - [ ] Auto config server. Loop over serial ports, check for devices and flash config to them.
@@ -61,9 +64,9 @@ make build-pi
 
 ## Media
 3D printed case, check `./stl` for files.
-![Aint they cute?!](/images/3.jpg)
+[Aint they cute?!](/images/3.jpg)
 
-![](/images/model-animation.gif)
+[](/images/model-animation.gif)
 
 Deep sleep, wake, connect wifi, connect mqtt, take measurement, send measurement, deep sleep...
-![Oooh look at the pretty lights!](/images/blinkenlights.gif)
+[Oooh look at the pretty lights!](/images/blinkenlights.gif)
