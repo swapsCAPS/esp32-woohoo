@@ -314,7 +314,7 @@
           "exemplar": true,
           "expr": "holt_winters(esp32_humidity[6h], 0.09, 0.02)",
           "hide": false,
-          "interval": "5m",
+          "interval": "",
           "legendFormat": "{{mac}}",
           "refId": "A"
         },
@@ -546,8 +546,8 @@
             "mode": "thresholds"
           },
           "mappings": [],
-          "max": 4096,
-          "min": 0,
+          "max": 4095,
+          "min": 2000,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -557,15 +557,19 @@
               },
               {
                 "color": "orange",
-                "value": 1000
+                "value": 2400
               },
               {
                 "color": "light-green",
-                "value": 1500
+                "value": 2600
               },
               {
-                "color": "light-blue",
+                "color": "green",
                 "value": 3000
+              },
+              {
+                "color": "blue",
+                "value": 4095
               }
             ]
           },
@@ -659,12 +663,31 @@
         {
           "exemplar": true,
           "expr": "esp32_bat_lvl",
-          "interval": "1h",
+          "interval": "",
           "legendFormat": "{{mac}}",
           "refId": "A"
         }
       ],
-      "thresholds": [],
+      "thresholds": [
+        {
+          "$$hashKey": "object:271",
+          "colorMode": "ok",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 2600,
+          "yaxis": "left"
+        },
+        {
+          "$$hashKey": "object:283",
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "lt",
+          "value": 2400,
+          "yaxis": "left"
+        }
+      ],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
@@ -690,7 +713,7 @@
           "label": "",
           "logBase": 1,
           "max": "4096",
-          "min": "0",
+          "min": "2200",
           "show": true
         },
         {
@@ -710,7 +733,7 @@
       }
     }
   ],
-  "refresh": "1m",
+  "refresh": "5m",
   "schemaVersion": 27,
   "style": "dark",
   "tags": [],
@@ -718,12 +741,12 @@
     "list": []
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-7d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "esp32s",
   "uid": "2ztBY7rGk",
-  "version": 38
+  "version": 53
 }
