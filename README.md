@@ -29,7 +29,7 @@ Dependencies:
 
 In Arduino IDE -> File -> Preferences -> Additional Boards Manager URLs, add: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`  
 Add a `secret.h` file in the root of the project with WiFi credentials
-```
+```c
 // ./secret.h
 char *DEFAULT_SSID = "SSID";
 char *DEFAULT_PASSWORD = "hunter1"; // lol
