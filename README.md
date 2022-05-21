@@ -6,8 +6,9 @@ They take measurements roughly every minute, send it to an mqtt broker and go ba
 Code can be found in `./esp32-woohoo.ino`
 
 ### Server
-Simple rust mqtt scraper to expose prometheus metrics.
-Code can be found in `./mqtt-to-prom`
+Simple rust mqtt scraper to expose prometheus metrics.  
+Code can be found in `./mqtt-to-prom`  
+Grafana dashboard available in `./mqtt-to-prom/meta/grafana-dashboard.json`
 
 ### MQTT
 If using mosquitto and running in a safe environment set
