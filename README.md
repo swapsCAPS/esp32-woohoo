@@ -32,7 +32,7 @@ Add a `secret.h` file in the root of the project with WiFi credentials
 ```
 // ./secret.h
 char *DEFAULT_SSID = "SSID";
-char *DEFAULT_PASSWORD = "hunter1";
+char *DEFAULT_PASSWORD = "hunter1"; // lol
 ```
 
 #### mqtt-to-prom
