@@ -24,7 +24,7 @@ Dependencies:
 - FastLED
 - Adafruit_Sensor
 - Adafruit_BME280
-- PubSubClient by Nico O'Leary
+- PubSubClient by Nick O'Leary
 - Add an ![additional board](https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json) to Arduino IDE -> File -> Preferences
 
 #### mqtt-to-prom
