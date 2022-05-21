@@ -26,7 +26,14 @@ Dependencies:
 - Adafruit_Sensor
 - Adafruit_BME280
 - PubSubClient by Nick O'Leary
-- In Arduino IDE -> File -> Preferences -> Additional Boards Manager URLs, add: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
+
+In Arduino IDE -> File -> Preferences -> Additional Boards Manager URLs, add: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`  
+Add a `secret.h` file in the root of the project with WiFi credentials
+```
+// ./secret.h
+char *DEFAULT_SSID = "SSID";
+char *DEFAULT_PASSWORD = "hunter1";
+```
 
 #### mqtt-to-prom
 Make sure [cross](https://github.com/rust-embedded/cross) is installed
