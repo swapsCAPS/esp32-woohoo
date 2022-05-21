@@ -9,10 +9,23 @@ Code can be found in `./esp32-woohoo.ino`
 Simple rust mqtt scraper to expose prometheus metrics.
 Code can be found in `./mqtt-to-prom`
 
+### MQTT
+If using mosquitto and running in a safe environment set
+```
+# /etc/mosquitto/mosquitto.conf
+listener 1883 0.0.0.0 # Allow external connections
+allow_anonymous true  # We have not set up auth
+```
+
 ### Build
 
 #### esp32-woohoo.ino
-Use Arduino IDE
+Dependencies:
+- FastLED
+- Adafruit_Sensor
+- Adafruit_BME280
+- PubSubClient by Nico O'Leary
+- Add an ![additional board](https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json) to Arduino IDE -> File -> Preferences
 
 #### mqtt-to-prom
 Make sure ![cross](https://github.com/rust-embedded/cross) is installed
