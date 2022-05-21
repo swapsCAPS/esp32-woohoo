@@ -64,9 +64,9 @@ make build-pi
 
 ## Media
 3D printed case, check `./stl` for files.
-[Aint they cute?!](/images/3.jpg)
+![Aint they cute?!](/images/3.jpg)
 
-[](/images/model-animation.gif)
+![](/images/model-animation.gif)
 
-Deep sleep, wake, connect wifi, connect mqtt, take measurement, send measurement, deep sleep...
-[Oooh look at the pretty lights!](/images/blinkenlights.gif)
+Deep sleep, wake, connect wifi, connect mqtt, take measurement, send measurement, deep sleep...  
+![Oooh look at the pretty lights!](/images/blinkenlights.gif)
