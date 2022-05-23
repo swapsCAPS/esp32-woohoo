@@ -28,8 +28,7 @@ allow_anonymous true  # We have not set up auth
 
 ### esp32-woohoo.ino
 - Add the FireBeetle ESP32-E board in Arduino IDE Boards Manager
-  - In Arduino IDE -> File -> Preferences -> Additional Boards Manager URLs, add:
-  - `http://download.dfrobot.top/FireBeetle/package_DFRobot_index.json`
+  - In Arduino IDE -> File -> Preferences -> Additional Boards Manager URLs, add: `http://download.dfrobot.top/FireBeetle/package_DFRobot_index.json`
     - This is for the DFRobot ESP32-E version!
     - Their server is slow af, grab coffee
   - Select the board in Arduino IDE -> Tools -> Board -> DFRobot ESP32 Arduino -> DFRobot FireBeetle ESP32-E
