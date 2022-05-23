@@ -8,8 +8,8 @@
 
 ## Devices
 Battery powered ESP32 + BME280 modules.  
-They take measurements roughly every minute, send it to an mqtt broker and go back to sleep.  
-Code can be found in `./esp32-woohoo.ino`
+They take a measurement, send it to an mqtt broker and go to sleep for `TIME_TO_SLEEP`, defined in `./config.h`.  
+Arduino code can be found in `./esp32-woohoo.ino`
 
 ## Server
 Simple rust mqtt scraper to expose prometheus metrics.  
