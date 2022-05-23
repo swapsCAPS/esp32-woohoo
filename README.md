@@ -33,8 +33,8 @@ allow_anonymous true  # We have not set up auth
     - Their server is slow af, grab coffee
   - Select the board in Arduino IDE -> Tools -> Board -> DFRobot ESP32 Arduino -> DFRobot FireBeetle ESP32-E
 - Ensure the following libs are installed
-  - Wifi `1.2.7`
-  - FastLED `3.5.0`
+  - WiFi by Arduino `1.2.7`
+  - FastLED by Daniel Garcia `3.5.0`
   - Adafruit Unified Sensor `1.15`
   - Adafruit BME280 Library `2.2.2`
   - PubSubClient by Nick O'Leary `2.8.0`
