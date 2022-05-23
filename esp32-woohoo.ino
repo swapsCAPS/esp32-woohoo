@@ -6,13 +6,12 @@
 #include <PubSubClient.h>
 
 #include "secret.h"
+#include "config.h"
 
-#define SEALEVELPRESSURE_HPA 1013.00
 #define NUM_LEDS 1
 #define DATA_PIN 5
 #define CLOCK_PIN 13
 #define uS_TO_S_FACTOR 1000000
-#define TIME_TO_SLEEP  5 * 60 // TODO increase me
 #define I2C_SDA 21
 #define I2C_SCL 22
 
@@ -179,7 +178,7 @@ void initConfig() {
     }
   }
 
-  if (strcmp(ssid, DEFAULT_SSID) == 0 && strcmp(pass, DEFAULT_PASSWORD) == 0) {
+  if (strcmp(ssid, SSID) == 0 && strcmp(pass, WIFI_PASSWORD) == 0) {
     Serial.println("-- initConfig() using defaults as set in secret.h");
   }
 
@@ -268,8 +267,8 @@ void setup() {
 
   Wire.begin(I2C_SDA, I2C_SCL);
 
-  strcpy(ssid, DEFAULT_SSID);
-  strcpy(pass, DEFAULT_PASSWORD);
+  strcpy(ssid, SSID);
+  strcpy(pass, WIFI_PASSWORD);
 
   print_wakeup_reason();
 

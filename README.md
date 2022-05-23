@@ -1,16 +1,22 @@
 # ESP32 + BME280 IoT Project
 
-### Devices
+## BOM
+- DFRobot Firebeetle ESP32-E
+- 3.7V LiPo battery
+- BME280
+- Rectangular rocker switch
+
+## Devices
 Battery powered ESP32 + BME280 modules.  
 They take measurements roughly every minute, send it to an mqtt broker and go back to sleep.  
 Code can be found in `./esp32-woohoo.ino`
 
-### Server
+## Server
 Simple rust mqtt scraper to expose prometheus metrics.  
 Code can be found in `./mqtt-to-prom`  
 Grafana dashboard available in `./mqtt-to-prom/meta/grafana-dashboard.json`
 
-### MQTT
+## MQTT
 If using mosquitto and running in a safe environment set
 ```
 # /etc/mosquitto/mosquitto.conf
@@ -18,24 +24,29 @@ listener 1883 0.0.0.0 # Allow external connections
 allow_anonymous true  # We have not set up auth
 ```
 
-### Build
+## Build
 
-#### esp32-woohoo.ino
-Dependencies:
-- FastLED
-- Adafruit_Sensor
-- Adafruit_BME280
-- PubSubClient by Nick O'Leary
+### esp32-woohoo.ino
+- Add the FireBeetle ESP32-E board in Arduino IDE Boards Manager
+  - In Arduino IDE -> File -> Preferences -> Additional Boards Manager URLs, add:
+  - `http://download.dfrobot.top/FireBeetle/package_DFRobot_index.json`
+    - This is for the DFRobot ESP32-E version!
+    - Their server is slow af, grab coffee
+  - Select the board in Arduino IDE -> Tools -> Board -> DFRobot ESP32 Arduino -> DFRobot FireBeetle ESP32-E
+- Ensure the following libs are installed
+  - Wifi `1.2.7`
+  - FastLED `3.5.0`
+  - Adafruit Unified Sensor `1.15`
+  - Adafruit BME280 Library `2.2.2`
+  - PubSubClient by Nick O'Leary `2.8.0`
+- Add a `secret.h` file in the root of the project with WiFi credentials
+  ```c
+  // ./secret.h
+  #define SSID "SSID"
+  #define WIFI_PASSWORD "hunter1" // lol
+  ```
 
-In Arduino IDE -> File -> Preferences -> Additional Boards Manager URLs, add: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`  
-Add a `secret.h` file in the root of the project with WiFi credentials
-```c
-// ./secret.h
-char *DEFAULT_SSID = "SSID";
-char *DEFAULT_PASSWORD = "hunter1"; // lol
-```
-
-#### mqtt-to-prom
+### mqtt-to-prom
 Make sure [cross](https://github.com/rust-embedded/cross) is installed
 ```
 cargo install cross
