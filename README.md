@@ -56,7 +56,7 @@ make build-pi
 ```
 
 ## TODO
-- [ ] Add timers to go back to sleep if connection not made
+- [x] Add timer to go back to sleep if connection not made
 - [x] Round values to eliminate "noise"
 - [x] [bugfix] parsing float goes wrong sometimes, write some tests
   - [x] test this
