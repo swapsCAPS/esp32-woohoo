@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
-#include <PubSubClient.h>
+#include <AsyncMqttClient.h>
 
 #include "secret.h"
 #include "config.h"
@@ -31,8 +31,7 @@ char topicBuffie[32];
 char pubBuffie[27];
 char valBuffie[8];
 
-WiFiClient wifiClient;
-PubSubClient mqttClient(wifiClient);
+AsyncMqttClient mqttClient;
 
 void array_to_string(byte array[], unsigned int len, char buffer[]) {
   for (unsigned int i = 0; i < len; i++) {
@@ -74,83 +73,75 @@ void blinkDelay(uint16_t ival, uint8_t times, uint32_t color) {
   }
 }
 
-void printWiFiStatus() {
-  switch (WiFi.status()) {
-    case WL_CONNECTED:
-      Serial.println("--- WiFi.status(): WL_CONNECTED");
-      break;
-    case WL_NO_SHIELD:
-      Serial.println("--- WiFi.status(): WL_NO_SHIELD");
-      break;
-    case WL_CONNECT_FAILED:
-      Serial.println("--- WiFi.status(): WL_CONNECT_FAILED");
-      break;
-    case WL_CONNECTION_LOST:
-      Serial.println("--- WiFi.status(): WL_CONNECTION_LOST");
-      break;
-    case WL_DISCONNECTED:
-      Serial.println("--- WiFi.status(): WL_DISCONNECTED");
-      break;
-    case WL_SCAN_COMPLETED:
-      Serial.println("--- WiFi.status(): WL_DISCONNECTED");
-      break;
-    case WL_NO_SSID_AVAIL:
-      Serial.println("--- WiFi.status(): WL_NO_SSID_AVAIL");
-      break;
-    case WL_IDLE_STATUS:
-      Serial.println("--- WiFi.status(): WL_IDLE_STATUS");
-      break;
-    default:
-      Serial.print("--- WiFi.status(): Unknown WiFi status [");
-      Serial.print(WiFi.status());
-      Serial.println("]");
-      break;
-  }
+void connectToWifi() {
+  Serial.println("Connecting to Wi-Fi...");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+}
+
+void connectToMqtt() {
+  Serial.println("Connecting to MQTT...");
+  mqttClient.connect();
+}
+
+void onWiFiEvent(WiFiEvent_t event) {
+    Serial.printf("--onWiFiEvent() event: %d\n", event);
+    switch(event) {
+      case SYSTEM_EVENT_STA_GOT_IP:
+          Serial.print("-- onWiFiEvent() connected to ");
+          Serial.print(ssid);
+          Serial.print(" with ");
+          Serial.print(pass);
+          Serial.print(", own ip: [");
+          Serial.print(WiFi.localIP());
+          Serial.println("]");
+
+          WiFi.macAddress(macAddress);
+          setMacAddressStr();
+          setTopicBuffie();
+
+          connectToMqtt();
+
+          break;
+      case SYSTEM_EVENT_STA_DISCONNECTED:
+          Serial.println("WiFi lost connection");
+          break;
+    }
 }
 
 void initWiFi() {
   Serial.println("-- initWiFi() start");
 
-  Serial.print("-- initWiFi() connecting to: \"");
+  Serial.print("-- initWiFi() configured for: \"");
   Serial.print(ssid);
   Serial.print("\" with \"");
   Serial.print(pass);
   Serial.println("\"");
 
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.println("-- initWiFi() connection failed, retrying...");
-    delay(5000);
-  }
-
-  Serial.print("-- initWiFi() connected to ");
-  Serial.print(ssid);
-  Serial.print(" with ");
-  Serial.print(pass);
-  Serial.print(", own ip: [");
-  Serial.print(WiFi.localIP());
-  Serial.println("]");
-
-  WiFi.macAddress(macAddress);
-  setMacAddressStr();
-  setTopicBuffie();
+  WiFi.mode(WIFI_STA);
+  WiFi.onEvent(onWiFiEvent);
 
   Serial.println("-- initWiFi() finish");
+}
+
+void onMqttConnect(bool sessionPresent) {
+  Serial.println("-- onMqttConnect() connected");
+
+  measure();
+
+  mqttClient.disconnect();
+  WiFi.disconnect();
+
+  Serial.println("-- onMqttConnect() back to sleep");
+
+  esp_deep_sleep_start();
 }
 
 void initMQTT() {
   Serial.println("-- initMQTT() start");
 
-  mqttClient.setServer(broker, 1883);
-
-  while(!mqttClient.connected()) {
-    Serial.print("-- initMQTT() connecting with client id: ");
-    Serial.println(macAddressStrArr);
-
-    if (mqttClient.connect("test")) {
-      Serial.println("-- i
-    /* blinkDelay(1000, 5, 0x00FFFF); */
-    delay(5000);
-  }
+  mqttClient.setServer(MQTT_HOST, MQTT_PORT);
+  mqttClient.setClientId(macAddressStrArr);
+  mqttClient.onConnect(onMqttConnect);
 
   Serial.println("-- initMQTT() finish");
 }
@@ -234,7 +225,6 @@ void measure() {
 
   while(!bme.begin(0x76)) {
     Serial.println("-- measure() bme.begin() failed");
-    delay(1000);
   }
 
   bme.setSampling(
@@ -262,9 +252,7 @@ void measure() {
   Serial.print("-- measure() publishing: ");
   Serial.println(pubBuffie);
 
-  mqttClient.publish(topicBuffie, pubBuffie);
-
-  delay(500);
+  mqttClient.publish(topicBuffie, 0, true, pubBuffie);
 
   Serial.println("-- measure() finish");
 }
@@ -278,9 +266,6 @@ void setup() {
   strcpy(ssid, WIFI_SSID);
   strcpy(pass, WIFI_PASSWORD);
 
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, pass);
-
   print_wakeup_reason();
 
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
@@ -290,22 +275,11 @@ void setup() {
   Serial.println("* setup() start");
 
   initWiFi();
-
-  delay(30000);
-
   initMQTT();
 
-  delay(1000);
+  connectToWifi();
 
-  measure();
-
-  delay(1000);
-
-  Serial.println("* setup() finish");
-
-  mqttClient.disconnect();
-  WiFi.disconnect();
-  esp_deep_sleep_start();
+  Serial.println("* setup() finished");
 }
 
 void loop() {

@@ -37,11 +37,11 @@ allow_anonymous true  # We have not set up auth
   - FastLED by Daniel Garcia `3.5.0`
   - Adafruit Unified Sensor `1.15`
   - Adafruit BME280 Library `2.2.2`
-  - PubSubClient by Nick O'Leary `2.8.0`
+  - https://github.com/marvinroger/async-mqtt-client
 - Add a `secret.h` file in the root of the project with WiFi credentials
   ```c
   // ./secret.h
-  #define SSID "SSID"
+  #define WIFI_SSID "SSID"
   #define WIFI_PASSWORD "hunter1" // lol
   ```
 
@@ -56,6 +56,7 @@ make build-pi
 ```
 
 ## TODO
+- [ ] Add timers to go back to sleep if connection not made
 - [x] Round values to eliminate "noise"
 - [x] [bugfix] parsing float goes wrong sometimes, write some tests
   - [x] test this
