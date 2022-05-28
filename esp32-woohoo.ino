@@ -146,63 +146,6 @@ void initMQTT() {
   Serial.println("-- initMQTT() finish");
 }
 
-// TODO init server location in same way as wifi.
-// TODO init client id
-// TODO persist config in EEPROM
-void initConfig() {
-  Serial.println("-- initConfig() start");
-
-  Serial.println("-- initConfig() waiting for wifi_conf...");
-
-  setLED(0xFF00BB);
-
-  delay(2000);
-
-  while (Serial.available() > 0) {
-    String str = Serial.readString();
-    Serial.print("-- initConfig() received: [");
-    Serial.print(str);
-    Serial.println("]");
-
-    if (str.startsWith("wifi_conf=")) {
-      String cut = str.substring(10);
-      cut.trim(); // Potential white space
-      Serial.println("-- initConfig() setting wifi conf");
-      cut.substring(0, cut.indexOf(",")).toCharArray(ssid, 32);
-      Serial.print("-- initConfig() ssid: ["); Serial.print(ssid); Serial.println("]");
-      Serial.print("-- initConfig() pass: ["); Serial.print(pass); Serial.println("]");
-      cut.substring(cut.indexOf(",") + 1).toCharArray(pass, 20);
-    } else {
-      Serial.print("-- initConfig() unknown input: ");
-    }
-  }
-
-  if (strcmp(ssid, WIFI_SSID) == 0 && strcmp(pass, WIFI_PASSWORD) == 0) {
-    Serial.println("-- initConfig() using defaults as set in secret.h");
-  }
-
-  Serial.println("-- initConfig() done");
-}
-
-bool initConnection() {
-  bool isConnected = false;
-  for (int i = 0; i < 5; i++) {
-    Serial.println("hello?");
-    delay(500);
-    while (Serial.available() > 0) {
-      String str = Serial.readString();
-      char response[3];
-      str.toCharArray(response, 3);
-      if (strcmp(response, "hi!") == 0) {
-        Serial.println("hi there!");
-        isConnected = true;
-        break;
-      }
-    }
-  }
-  return isConnected;
-}
-
 void print_wakeup_reason(){
   esp_sleep_wakeup_cause_t wakeup_reason;
 
