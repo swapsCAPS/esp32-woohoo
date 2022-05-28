@@ -9,8 +9,8 @@
 #include "config.h"
 
 extern "C" {
-	#include "freertos/FreeRTOS.h"
-	#include "freertos/timers.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/timers.h"
 }
 
 #define NUM_LEDS 1
@@ -96,28 +96,31 @@ void connectToMqtt() {
 }
 
 void onWiFiEvent(WiFiEvent_t event) {
-    Serial.printf("-- onWiFiEvent() event: %d\n", event);
-    switch(event) {
-      case SYSTEM_EVENT_STA_GOT_IP:
-          Serial.print("-- onWiFiEvent() connected to ");
-          Serial.print(ssid);
-          Serial.print(" with ");
-          Serial.print(pass);
-          Serial.print(", own ip: [");
-          Serial.print(WiFi.localIP());
-          Serial.println("]");
+  Serial.printf("-- onWiFiEvent() event: %d\n", event);
+  switch(event) {
+    case SYSTEM_EVENT_STA_GOT_IP:
+      Serial.print("-- onWiFiEvent() connected to ");
+      Serial.print(ssid);
+      Serial.print(" with ");
+      Serial.print(pass);
+      Serial.print(", own ip: [");
+      Serial.print(WiFi.localIP());
+      Serial.println("]");
 
-          WiFi.macAddress(macAddress);
-          setMacAddressStr();
-          setTopicBuffie();
+      WiFi.macAddress(macAddress);
+      setMacAddressStr();
+      setTopicBuffie();
 
-          connectToMqtt();
+      connectToMqtt();
 
-          break;
-      case SYSTEM_EVENT_STA_DISCONNECTED:
-          Serial.println("WiFi lost connection");
-          break;
-    }
+      break;
+    case SYSTEM_EVENT_STA_DISCONNECTED:
+      Serial.println("-- onWiFiEvent() disconnected");
+
+      goToSleep();
+
+      break;
+  }
 }
 
 void initWiFi() {
@@ -135,15 +138,19 @@ void initWiFi() {
   Serial.println("-- initWiFi() finish");
 }
 
+void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
+  Serial.printf("-- onMqttDisconnect() disconnecting WiFi %d\n", reason);
+
+  WiFi.disconnect();
+}
+
+
 void onMqttConnect(bool sessionPresent) {
   Serial.println("-- onMqttConnect() connected");
 
   measure();
 
   mqttClient.disconnect();
-  WiFi.disconnect();
-
-  goToSleep();
 }
 
 void goToSleep() {
@@ -157,6 +164,7 @@ void initMQTT() {
 
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
   mqttClient.setClientId(macAddressStrArr);
+  mqttClient.onDisconnect(onMqttDisconnect);
   mqttClient.onConnect(onMqttConnect);
 
   Serial.println("-- initMQTT() finish");
@@ -211,7 +219,7 @@ void measure() {
   Serial.print("-- measure() publishing: ");
   Serial.println(pubBuffie);
 
-  mqttClient.publish(topicBuffie, 0, true, pubBuffie);
+  mqttClient.publish(topicBuffie, 1, false, pubBuffie);
 
   Serial.println("-- measure() finish");
 }
