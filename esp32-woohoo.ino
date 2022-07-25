@@ -4,6 +4,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include <AsyncMqttClient.h>
+#include "time.h"
 
 #include "secret.h"
 #include "config.h"
@@ -20,6 +21,14 @@ extern "C" {
 #define I2C_SDA 21
 #define I2C_SCL 22
 
+RTC_DATA_ATTR int successCounter = 0;
+RTC_DATA_ATTR int failureCounter = 0;
+
+bool succeeded = false;
+
+const char* ntpServer = "pool.ntp.org";
+unsigned long epochTime;
+
 TimerHandle_t deadmanSwitch;
 
 CRGB leds[NUM_LEDS];
@@ -35,10 +44,31 @@ char pass[20];
 
 char macAddressStrArr[18];
 char topicBuffie[32];
-char pubBuffie[27];
-char valBuffie[8];
+char pubBuffie[128];
+char valBuffie[64];
 
 AsyncMqttClient mqttClient;
+
+void _configTime() {
+    Serial.println("-- _configTime()");
+    configTime(0, 0, ntpServer);
+}
+
+// Function that gets current epoch time
+unsigned long getTime() {
+  Serial.println("-- getTime()");
+  time_t now;
+  struct tm timeinfo;
+  Serial.println("-- getTime() getting local time");
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("-- getTime() could not get time : (");
+    return(0);
+  }
+  time(&now);
+  Serial.println("-- getTime() done");
+
+  return now;
+}
 
 void array_to_string(byte array[], unsigned int len, char buffer[]) {
   for (unsigned int i = 0; i < len; i++) {
@@ -107,6 +137,7 @@ void onWiFiEvent(WiFiEvent_t event) {
       Serial.print(WiFi.localIP());
       Serial.println("]");
 
+      _configTime();
       WiFi.macAddress(macAddress);
       setMacAddressStr();
       setTopicBuffie();
@@ -116,8 +147,6 @@ void onWiFiEvent(WiFiEvent_t event) {
       break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
       Serial.println("-- onWiFiEvent() disconnected");
-
-      goToSleep();
 
       break;
   }
@@ -151,10 +180,18 @@ void onMqttConnect(bool sessionPresent) {
   measure();
 
   mqttClient.disconnect();
+
+  goToSleep();
 }
 
 void goToSleep() {
   Serial.println("-- goToSleep()");
+
+  if (succeeded == true) {
+    successCounter += 1;
+  } else {
+    failureCounter += 1;
+  }
 
   esp_deep_sleep_start();
 }
@@ -204,22 +241,40 @@ void measure() {
 
   bme.takeForcedMeasurement();
 
+  // Trying really hard to avoid String(), cause that's what the internet tells me to do...
   dtostrf(bme.readTemperature(), 5, 2, valBuffie);
   strcat(pubBuffie, valBuffie);
   strcat(pubBuffie, ",");
+
   dtostrf(bme.readHumidity(), 5, 2, valBuffie);
   strcat(pubBuffie, valBuffie);
   strcat(pubBuffie, ",");
+
   dtostrf(bme.readPressure() / 100.0f, 7, 2, valBuffie);
   strcat(pubBuffie, valBuffie);
   strcat(pubBuffie, ",");
+
   itoa(analogRead(batteryLevelPin), valBuffie, 10);
+  strcat(pubBuffie, valBuffie);
+  strcat(pubBuffie, ",");
+
+  itoa(getTime(), valBuffie, 10);
+  strcat(pubBuffie, valBuffie);
+  strcat(pubBuffie, ",");
+
+  itoa(successCounter, valBuffie, 10);
+  strcat(pubBuffie, valBuffie);
+  strcat(pubBuffie, ",");
+
+  itoa(failureCounter, valBuffie, 10);
   strcat(pubBuffie, valBuffie);
 
   Serial.print("-- measure() publishing: ");
   Serial.println(pubBuffie);
 
   mqttClient.publish(topicBuffie, 1, false, pubBuffie);
+
+  succeeded = true;
 
   Serial.println("-- measure() finish");
 }
