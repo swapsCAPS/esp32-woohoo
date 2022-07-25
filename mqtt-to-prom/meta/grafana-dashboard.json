@@ -120,7 +120,7 @@
         "values": true
       },
       "lines": true,
-      "linewidth": 1,
+      "linewidth": 2,
       "nullPointMode": "null",
       "options": {
         "alertThreshold": true
@@ -295,7 +295,7 @@
         "values": true
       },
       "lines": true,
-      "linewidth": 1,
+      "linewidth": 2,
       "nullPointMode": "null",
       "options": {
         "alertThreshold": true
@@ -313,7 +313,7 @@
         {
           "exemplar": true,
           "expr": "holt_winters(esp32_humidity[6h], 0.09, 0.02)",
-          "hide": false,
+          "hide": true,
           "interval": "",
           "legendFormat": "{{mac}}",
           "refId": "A"
@@ -321,9 +321,9 @@
         {
           "exemplar": true,
           "expr": "esp32_humidity",
-          "hide": true,
+          "hide": false,
           "interval": "",
-          "legendFormat": "raw {{mac}}",
+          "legendFormat": "{{mac}}",
           "refId": "B"
         }
       ],
@@ -462,7 +462,7 @@
         "values": true
       },
       "lines": true,
-      "linewidth": 1,
+      "linewidth": 2,
       "nullPointMode": "null",
       "options": {
         "alertThreshold": true
@@ -480,6 +480,7 @@
         {
           "exemplar": true,
           "expr": "holt_winters(esp32_pressure[6h], 0.09, 0.02)",
+          "hide": true,
           "interval": "",
           "legendFormat": "{{mac}}",
           "refId": "A"
@@ -487,9 +488,9 @@
         {
           "exemplar": true,
           "expr": "esp32_pressure",
-          "hide": true,
+          "hide": false,
           "interval": "",
-          "legendFormat": "raw {{mac}}",
+          "legendFormat": "{{mac}}",
           "refId": "B"
         }
       ],
@@ -520,6 +521,165 @@
           "logBase": 1,
           "max": "1050",
           "min": "950",
+          "show": true
+        },
+        {
+          "$$hashKey": "object:282",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "dateTimeFromNow"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 0,
+        "y": 24
+      },
+      "id": 11,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.5.4",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "esp32_epoch * 1000",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{mac}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Last update",
+      "type": "stat"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "decimals": 2,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 17,
+        "x": 7,
+        "y": 24
+      },
+      "hiddenSeries": false,
+      "id": 12,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "sideWidth": 270,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.5.4",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "esp32_epoch * 1000",
+          "interval": "",
+          "legendFormat": "{{mac}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "epoch",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:281",
+          "decimals": null,
+          "format": "dateTimeAsIso",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": null,
           "show": true
         },
         {
@@ -581,7 +741,7 @@
         "h": 8,
         "w": 7,
         "x": 0,
-        "y": 24
+        "y": 32
       },
       "id": 9,
       "options": {
@@ -628,7 +788,7 @@
         "h": 8,
         "w": 17,
         "x": 7,
-        "y": 24
+        "y": 32
       },
       "hiddenSeries": false,
       "id": 5,
@@ -645,7 +805,7 @@
         "values": true
       },
       "lines": true,
-      "linewidth": 1,
+      "linewidth": 2,
       "nullPointMode": "null",
       "options": {
         "alertThreshold": true
@@ -741,12 +901,12 @@
     "list": []
   },
   "time": {
-    "from": "now-7d",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "esp32s",
   "uid": "2ztBY7rGk",
-  "version": 53
+  "version": 57
 }
