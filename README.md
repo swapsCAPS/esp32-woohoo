@@ -6,6 +6,14 @@
 - BME280
 - Rectangular rocker switch
 
+## ESP32 WiFi woes
+My router does not play nice with ESP32's it seems. Using my phone's hotspot, connecting to the internet and getting a time from NTP works fine.
+I **am** gettign an IP address, so I know the credentials are correct. But it seems I can't reach the internet, and get disconnected fairly quickly after connecting.  
+I fiddled with the security settings and changed from WPA2 + WPA3 to WPA + WPA2 and all of a sudden the ESP32 connected fine. Yay! Wanting to be thorough, I tried using WPA2 + WPA3 mode again to see if I could reproduce my issue. But no! For some weird reason it just keeps connecting now. Needs some more testing. I'll be testing a deep sleep script that sleeps for 10 minutes, then when it wakes up, gets the time and logs if it succeeded or failed to `Serial`.
+According to some sources you need to disconnect wifi before deep sleep. I have not been able to reproduce consistent failures by _not_ disconnecting though, so I'll test without that first.
+Seems that I successfully got ntp time every 10 minutes. Trying with WPA2 + WPA3 for a couple of cycles. Something weird is going on with my router. I should try turning it off and on again and/or doing a hard reset.  
+Could it be there is some weird stateful thing going on? 
+
 ## Devices
 Battery powered ESP32 + BME280 modules.  
 They take a measurement, send it to an mqtt broker and go to sleep for `TIME_TO_SLEEP`, defined in `./config.h`.  
