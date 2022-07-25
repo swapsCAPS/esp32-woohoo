@@ -23,6 +23,19 @@ lazy_static! {
         register_gauge_vec!("esp32_pressure", "Pressure", &["mac"]).unwrap();
     static ref BATTERY_LEVEL: GaugeVec =
         register_gauge_vec!("esp32_bat_lvl", "Battery level", &["mac"]).unwrap();
+    static ref EPOCH: GaugeVec = register_gauge_vec!("esp32_epoch", "Epoch", &["mac"]).unwrap();
+    static ref MEASUREMENT_SUCCESS: GaugeVec = register_gauge_vec!(
+        "esp32_measurement_success",
+        "Times taking a measurement succeeded",
+        &["mac"]
+    )
+    .unwrap();
+    static ref MEASUREMENT_FAILURE: GaugeVec = register_gauge_vec!(
+        "esp32_measurement_failure",
+        "Times measurement failed",
+        &["mac"]
+    )
+    .unwrap();
 }
 
 fn main() {
@@ -51,35 +64,53 @@ fn main() {
 
                 let split: Vec<&str> = payload.split(",").collect();
 
-                if let [t, h, p, b] = &split[..] {
-                    if let Ok(temperature) = t.trim().parse::<f64>() {
+                if let [temp, h, p, b, epoch, success, failure] = &split[..] {
+                    if let Ok(result) = temp.trim().parse::<f64>() {
                         TEMPERATURE_GAUGE
                             .with_label_values(&[mac])
-                            .set((temperature * 4.0).round() / 4.0);
+                            .set((result * 4.0).round() / 4.0);
                     } else {
                         warn!("Could not parse temp from {}", payload);
                     }
 
-                    if let Ok(humidity) = h.trim().parse::<f64>() {
+                    if let Ok(result) = h.trim().parse::<f64>() {
                         HUMIDITY_GAUGE
                             .with_label_values(&[mac])
-                            .set((humidity * 4.0).round() / 4.0);
+                            .set((result * 4.0).round() / 4.0);
                     } else {
                         warn!("Could not parse humidity from {}", payload);
                     }
 
-                    if let Ok(pressure) = p.trim().parse::<f64>() {
+                    if let Ok(result) = p.trim().parse::<f64>() {
                         PRESSURE_GAUGE
                             .with_label_values(&[mac])
-                            .set((pressure * 4.0).round() / 4.0);
+                            .set((result * 4.0).round() / 4.0);
                     } else {
                         warn!("Could not parse pressure from {}", payload);
                     }
 
-                    if let Ok(bat_lvl) = b.trim().parse::<f64>() {
-                        BATTERY_LEVEL.with_label_values(&[mac]).set(bat_lvl);
+                    if let Ok(result) = b.trim().parse::<f64>() {
+                        BATTERY_LEVEL.with_label_values(&[mac]).set(result);
                     } else {
                         warn!("Could not parse bat_lvl from {}", payload);
+                    }
+
+                    if let Ok(result) = epoch.trim().parse::<f64>() {
+                        EPOCH.with_label_values(&[mac]).set(result);
+                    } else {
+                        warn!("Could not parse epoch from {}", payload);
+                    }
+
+                    if let Ok(result) = success.trim().parse::<f64>() {
+                        MEASUREMENT_SUCCESS.with_label_values(&[mac]).set(result);
+                    } else {
+                        warn!("Could not parse success count from {}", payload);
+                    }
+
+                    if let Ok(result) = failure.trim().parse::<f64>() {
+                        MEASUREMENT_FAILURE.with_label_values(&[mac]).set(result);
+                    } else {
+                        warn!("Could not parse failure count from {}", payload);
                     }
                 } else {
                     warn!("Could not split payload from {}", payload);
