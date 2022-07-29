@@ -227,18 +227,6 @@ void measure() {
 
   /* setLED(0xFF00FF); */
 
-  while(!bme.begin(0x76)) {
-    Serial.println("-- measure() bme.begin() failed");
-  }
-
-  bme.setSampling(
-      Adafruit_BME280::MODE_FORCED,
-      Adafruit_BME280::SAMPLING_X1, // temp
-      Adafruit_BME280::SAMPLING_X1, // pressure
-      Adafruit_BME280::SAMPLING_X1, // humidity
-      Adafruit_BME280::FILTER_OFF
-      );
-
   bme.takeForcedMeasurement();
 
   // Trying really hard to avoid String(), cause that's what the internet tells me to do...
@@ -287,6 +275,18 @@ void setup() {
   FastLED.setBrightness(4); // Devices with overly bright LEDs suck!
 
   Wire.begin(I2C_SDA, I2C_SCL);
+
+  while(!bme.begin(0x76)) {
+    Serial.println("-- measure() bme.begin() failed");
+  }
+
+  bme.setSampling(
+      Adafruit_BME280::MODE_FORCED,
+      Adafruit_BME280::SAMPLING_X1, // temp
+      Adafruit_BME280::SAMPLING_X1, // pressure
+      Adafruit_BME280::SAMPLING_X1, // humidity
+      Adafruit_BME280::FILTER_OFF
+  );
 
   strcpy(ssid, WIFI_SSID);
   strcpy(pass, WIFI_PASSWORD);
