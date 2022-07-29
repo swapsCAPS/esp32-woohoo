@@ -230,7 +230,7 @@ void measure() {
   bme.takeForcedMeasurement();
 
   // Trying really hard to avoid String(), cause that's what the internet tells me to do...
-  dtostrf(bme.readTemperature(), 5, 2, valBuffie);
+  dtostrf(bme.readTemperature(), 6, 2, valBuffie);
   strcat(pubBuffie, valBuffie);
   strcat(pubBuffie, ",");
 
