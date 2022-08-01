@@ -20,6 +20,10 @@ Could it be there is some weird stateful thing going on?
 Experimenting with two devices with their jumper wire cut. Leaving one as is. Will turn them on at the same time. and see how long each will last.  
 **Update** I've left two devices side by side, in an attempt to minimize the WiFi interference component of the measurement. Weirdly, after 24 hours the one with its jumper cut is reporting a lower battery level than the one without the jumper cut. It's probably still just too early to say, on top of that, there are a lot of other variables that could influence the reading.
 
+## Weird readings
+Sometimes I'm getting way too high or way too low pressure and humidity readings. Experimenting with initializing the BME on start up, instead of right before taking measurement.  
+**Update** This has helped, although I still sometimes get a very low pressure reading. It seems like the BME280 needs some time to initialize.
+
 ## Devices
 Battery powered ESP32 + BME280 modules.  
 They take a measurement, send it to an mqtt broker and go to sleep for `TIME_TO_SLEEP`, defined in `./config.h`.  
