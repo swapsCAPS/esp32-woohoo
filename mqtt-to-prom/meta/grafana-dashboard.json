@@ -25,6 +25,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 2,
           "mappings": [],
           "max": 30,
           "min": 15,
@@ -77,11 +78,29 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "esp32_temperature",
-          "instant": false,
+          "expr": "esp32_temperature{mac=\"A8032AEA96D4\"}",
+          "instant": true,
           "interval": "",
-          "legendFormat": "{{mac}}",
+          "legendFormat": "Bedroom",
           "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_temperature{mac=\"84CCA81236F0\"}",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Cave",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_temperature{mac=\"A8032AEAA504\"}",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Living",
+          "refId": "C"
         }
       ],
       "title": "Temperature",
@@ -93,6 +112,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": null,
+      "decimals": 2,
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -137,11 +157,37 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "esp32_temperature",
+          "expr": "esp32_temperature{mac=\"A8032AEA96D4\"}",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Bedroom",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_temperature{mac=\"84CCA81236F0\"}",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Cave",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_temperature{mac=\"A8032AEAA504\"}",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Living",
+          "refId": "C"
+        },
+        {
+          "exemplar": true,
+          "expr": "avg(esp32_temperature)",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{mac}}",
-          "refId": "B"
+          "legendFormat": "Average",
+          "refId": "D"
         }
       ],
       "thresholds": [],
@@ -165,9 +211,9 @@
       "yaxes": [
         {
           "$$hashKey": "object:333",
-          "decimals": null,
+          "decimals": 2,
           "format": "celsius",
-          "label": null,
+          "label": "",
           "logBase": 1,
           "max": null,
           "min": null,
@@ -251,11 +297,29 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "esp32_humidity",
-          "instant": false,
+          "expr": "esp32_humidity{mac=\"A8032AEA96D4\"}",
+          "instant": true,
           "interval": "",
-          "legendFormat": "{{mac}}",
+          "legendFormat": "Bedroom",
           "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_humidity{mac=\"84CCA81236F0\"}",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Cave",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_humidity{mac=\"A8032AEAA504\"}",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Living",
+          "refId": "C"
         }
       ],
       "title": "Humidity",
@@ -312,19 +376,37 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "holt_winters(esp32_humidity[6h], 0.09, 0.02)",
-          "hide": true,
+          "expr": "esp32_humidity{mac=\"A8032AEA96D4\"}",
+          "instant": false,
           "interval": "",
-          "legendFormat": "{{mac}}",
+          "legendFormat": "Bedroom",
           "refId": "A"
         },
         {
           "exemplar": true,
-          "expr": "esp32_humidity",
+          "expr": "esp32_humidity{mac=\"84CCA81236F0\"}",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Cave",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_humidity{mac=\"A8032AEAA504\"}",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Living",
+          "refId": "C"
+        },
+        {
+          "exemplar": true,
+          "expr": "avg(esp32_humidity)",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{mac}}",
-          "refId": "B"
+          "legendFormat": "Average",
+          "refId": "D"
         }
       ],
       "thresholds": [],
@@ -418,11 +500,29 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "esp32_pressure",
-          "instant": false,
+          "expr": "esp32_pressure{mac=\"A8032AEA96D4\"}",
+          "instant": true,
           "interval": "",
-          "legendFormat": "{{mac}}",
+          "legendFormat": "Bedroom",
           "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_pressure{mac=\"84CCA81236F0\"}",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Cave",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_pressure{mac=\"A8032AEAA504\"}",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Living",
+          "refId": "C"
         }
       ],
       "title": "Pressure",
@@ -479,19 +579,31 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "holt_winters(esp32_pressure[6h], 0.09, 0.02)",
-          "hide": true,
+          "expr": "esp32_pressure{mac=\"A8032AEA96D4\"} > 800",
           "interval": "",
-          "legendFormat": "{{mac}}",
+          "legendFormat": "Bedroom",
           "refId": "A"
         },
         {
           "exemplar": true,
-          "expr": "esp32_pressure",
-          "hide": false,
+          "expr": "esp32_pressure{mac=\"84CCA81236F0\"} > 800",
           "interval": "",
-          "legendFormat": "{{mac}}",
+          "legendFormat": "Cave",
           "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_pressure{mac=\"A8032AEAA504\"} > 800",
+          "interval": "",
+          "legendFormat": "Living",
+          "refId": "C"
+        },
+        {
+          "exemplar": true,
+          "expr": "avg(esp32_pressure > 800)",
+          "interval": "",
+          "legendFormat": "Average",
+          "refId": "D"
         }
       ],
       "thresholds": [],
@@ -586,11 +698,29 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "esp32_epoch * 1000",
-          "instant": false,
+          "expr": "esp32_epoch{mac=\"A8032AEA96D4\"} * 1000",
+          "instant": true,
           "interval": "",
-          "legendFormat": "{{mac}}",
+          "legendFormat": "Bedroom",
           "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_epoch{mac=\"84CCA81236F0\"} * 1000",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Cave",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_epoch{mac=\"A8032AEAA504\"} * 1000",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Living",
+          "refId": "C"
         }
       ],
       "title": "Last update",
@@ -647,10 +777,29 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "esp32_epoch * 1000",
+          "expr": "esp32_epoch{mac=\"A8032AEA96D4\"} * 1000",
+          "instant": false,
           "interval": "",
-          "legendFormat": "{{mac}}",
+          "legendFormat": "Bedroom",
           "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_epoch{mac=\"84CCA81236F0\"} * 1000",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Cave",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_epoch{mac=\"A8032AEAA504\"} * 1000",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Living",
+          "refId": "C"
         }
       ],
       "thresholds": [],
@@ -761,11 +910,29 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "esp32_bat_lvl",
-          "instant": false,
+          "expr": "esp32_bat_lvl{mac=\"A8032AEA96D4\"}",
+          "instant": true,
           "interval": "",
-          "legendFormat": "{{mac}}",
+          "legendFormat": "Bedroom",
           "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_bat_lvl{mac=\"84CCA81236F0\"}",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Cave",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_bat_lvl{mac=\"A8032AEAA504\"}",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Living",
+          "refId": "C"
         }
       ],
       "title": "Battery level",
@@ -822,10 +989,27 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "esp32_bat_lvl",
+          "expr": "esp32_bat_lvl{mac=\"A8032AEA96D4\"}",
+          "hide": false,
           "interval": "",
-          "legendFormat": "{{mac}}",
+          "legendFormat": "Bedroom",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_bat_lvl{mac=\"84CCA81236F0\"}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Cave",
           "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "esp32_bat_lvl{mac=\"A8032AEAA504\"}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Living",
+          "refId": "C"
         }
       ],
       "thresholds": [
@@ -891,6 +1075,29 @@
         "align": false,
         "alignLevel": null
       }
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 7,
+        "x": 0,
+        "y": 40
+      },
+      "id": 14,
+      "options": {
+        "content": "| MAC          | Room    |\n| ------------ | ------- |\n| A8032AEA96D4 | Bedroom |\n| 84CCA81236F0 | Cave    |\n| A8032AEAA504 | Living  |",
+        "mode": "markdown"
+      },
+      "pluginVersion": "7.5.4",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "MAC mapping",
+      "type": "text"
     }
   ],
   "refresh": "5m",
@@ -901,12 +1108,12 @@
     "list": []
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "esp32s",
   "uid": "2ztBY7rGk",
-  "version": 57
+  "version": 78
 }
