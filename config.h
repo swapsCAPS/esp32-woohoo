@@ -6,7 +6,7 @@
 // Go back to sleep if no measurement was taken withing this time
 #define DEADMAN_SWITCH_MS 30 * 1000
 
-#define MQTT_HOST IPAddress(192, 168, 178, 20)
+#define MQTT_HOST IPAddress(192, 168, 178, 147)
 #define MQTT_PORT 1883
 
 // Hooked up using voltage divider
