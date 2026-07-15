@@ -48,72 +48,86 @@ fn main() {
     info!("mqtt_host {}", mqtt_host);
     info!("bind_address {}", bind_address);
 
-    thread::spawn(|| {
+    thread::spawn(move || {
         let mut mqttoptions = MqttOptions::new("esp32-server", mqtt_host, 1883);
         mqttoptions.set_keep_alive(5);
 
         let (mut client, mut connection) = Client::new(mqttoptions, 10);
         client.subscribe("sensors/thp/+", QoS::AtMostOnce).unwrap();
 
-        // Iterate to poll the eventloop for connection progress
         for (_, notification) in connection.iter().enumerate() {
-            debug!("Received {:?}", notification);
-            if let Ok(Event::Incoming(Incoming::Publish(p))) = notification {
-                let mac = p.topic.split("/").last().unwrap();
-                let payload = str::from_utf8(&p.payload).unwrap();
+            match notification {
+                Ok(Event::Incoming(Incoming::Publish(p))) => {
+                    let mac = p.topic.split("/").last().unwrap();
+                    let payload = match str::from_utf8(&p.payload) {
+                        Ok(v) => v,
+                        Err(_) => {
+                            warn!("Invalid UTF-8 payload");
+                            continue;
+                        }
+                    };
 
-                let split: Vec<&str> = payload.split(",").collect();
+                    let split: Vec<&str> = payload.split(",").collect();
 
-                if let [temp, h, p, b, epoch, success, failure] = &split[..] {
-                    if let Ok(result) = temp.trim().parse::<f64>() {
-                        TEMPERATURE_GAUGE
-                            .with_label_values(&[mac])
-                            .set((result * 4.0).round() / 4.0);
+                    if let [temp, h, p, b, epoch, success, failure] = &split[..] {
+                        if let Ok(result) = temp.trim().parse::<f64>() {
+                            TEMPERATURE_GAUGE
+                                .with_label_values(&[mac])
+                                .set((result * 4.0).round() / 4.0);
+                        } else {
+                            warn!("Could not parse temp from {}", payload);
+                        }
+
+                        if let Ok(result) = h.trim().parse::<f64>() {
+                            HUMIDITY_GAUGE
+                                .with_label_values(&[mac])
+                                .set((result * 4.0).round() / 4.0);
+                        } else {
+                            warn!("Could not parse humidity from {}", payload);
+                        }
+
+                        if let Ok(result) = p.trim().parse::<f64>() {
+                            PRESSURE_GAUGE
+                                .with_label_values(&[mac])
+                                .set((result * 4.0).round() / 4.0);
+                        } else {
+                            warn!("Could not parse pressure from {}", payload);
+                        }
+
+                        if let Ok(result) = b.trim().parse::<f64>() {
+                            BATTERY_LEVEL.with_label_values(&[mac]).set(result);
+                        } else {
+                            warn!("Could not parse bat_lvl from {}", payload);
+                        }
+
+                        if let Ok(result) = epoch.trim().parse::<f64>() {
+                            EPOCH.with_label_values(&[mac]).set(result);
+                        } else {
+                            warn!("Could not parse epoch from {}", payload);
+                        }
+
+                        if let Ok(result) = success.trim().parse::<f64>() {
+                            MEASUREMENT_SUCCESS.with_label_values(&[mac]).set(result);
+                        } else {
+                            warn!("Could not parse success count from {}", payload);
+                        }
+
+                        if let Ok(result) = failure.trim().parse::<f64>() {
+                            MEASUREMENT_FAILURE.with_label_values(&[mac]).set(result);
+                        } else {
+                            warn!("Could not parse failure count from {}", payload);
+                        }
                     } else {
-                        warn!("Could not parse temp from {}", payload);
+                        warn!("Could not split payload from {}", payload);
                     }
-
-                    if let Ok(result) = h.trim().parse::<f64>() {
-                        HUMIDITY_GAUGE
-                            .with_label_values(&[mac])
-                            .set((result * 4.0).round() / 4.0);
-                    } else {
-                        warn!("Could not parse humidity from {}", payload);
-                    }
-
-                    if let Ok(result) = p.trim().parse::<f64>() {
-                        PRESSURE_GAUGE
-                            .with_label_values(&[mac])
-                            .set((result * 4.0).round() / 4.0);
-                    } else {
-                        warn!("Could not parse pressure from {}", payload);
-                    }
-
-                    if let Ok(result) = b.trim().parse::<f64>() {
-                        BATTERY_LEVEL.with_label_values(&[mac]).set(result);
-                    } else {
-                        warn!("Could not parse bat_lvl from {}", payload);
-                    }
-
-                    if let Ok(result) = epoch.trim().parse::<f64>() {
-                        EPOCH.with_label_values(&[mac]).set(result);
-                    } else {
-                        warn!("Could not parse epoch from {}", payload);
-                    }
-
-                    if let Ok(result) = success.trim().parse::<f64>() {
-                        MEASUREMENT_SUCCESS.with_label_values(&[mac]).set(result);
-                    } else {
-                        warn!("Could not parse success count from {}", payload);
-                    }
-
-                    if let Ok(result) = failure.trim().parse::<f64>() {
-                        MEASUREMENT_FAILURE.with_label_values(&[mac]).set(result);
-                    } else {
-                        warn!("Could not parse failure count from {}", payload);
-                    }
-                } else {
-                    warn!("Could not split payload from {}", payload);
+                }
+                Ok(other) => {
+                    debug!("Received non-publish event: {:?}", other);
+                }
+                Err(e) => {
+                    error!("Connection error: {:?}", e);
+                    // Sleep to prevent tight CPU loop during broker downtime
+                    thread::sleep(std::time::Duration::from_secs(1));
                 }
             }
         }
