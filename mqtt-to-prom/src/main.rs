@@ -48,17 +48,35 @@ fn main() {
     info!("mqtt_host {}", mqtt_host);
     info!("bind_address {}", bind_address);
 
+    // --- MQTT Thread ---
     thread::spawn(move || {
         let mut mqttoptions = MqttOptions::new("esp32-server", mqtt_host, 1883);
         mqttoptions.set_keep_alive(5);
 
         let (mut client, mut connection) = Client::new(mqttoptions, 10);
-        client.subscribe("sensors/thp/+", QoS::AtMostOnce).unwrap();
 
-        for (_, notification) in connection.iter().enumerate() {
+        // Wrap subscription in case of early errors
+        if let Err(e) = client.subscribe("sensors/thp/+", QoS::AtMostOnce) {
+            error!("Failed to subscribe: {:?}", e);
+        }
+
+        // Process MQTT notifications
+        for (i, notification) in connection.iter().enumerate() {
+            // Every 1000 events, log a heartbeat to see if this loop is flooding
+            if i % 1000 == 0 {
+                debug!("MQTT Loop Heartbeat: processed {} events", i);
+            }
+
             match notification {
                 Ok(Event::Incoming(Incoming::Publish(p))) => {
-                    let mac = p.topic.split("/").last().unwrap();
+                    let mac = match p.topic.split("/").last() {
+                        Some(m) => m,
+                        None => {
+                            warn!("Failed to extract mac from topic: {}", p.topic);
+                            continue;
+                        }
+                    };
+
                     let payload = match str::from_utf8(&p.payload) {
                         Ok(v) => v,
                         Err(_) => {
@@ -74,78 +92,77 @@ fn main() {
                             TEMPERATURE_GAUGE
                                 .with_label_values(&[mac])
                                 .set((result * 4.0).round() / 4.0);
-                        } else {
-                            warn!("Could not parse temp from {}", payload);
                         }
-
                         if let Ok(result) = h.trim().parse::<f64>() {
                             HUMIDITY_GAUGE
                                 .with_label_values(&[mac])
                                 .set((result * 4.0).round() / 4.0);
-                        } else {
-                            warn!("Could not parse humidity from {}", payload);
                         }
-
                         if let Ok(result) = p.trim().parse::<f64>() {
                             PRESSURE_GAUGE
                                 .with_label_values(&[mac])
                                 .set((result * 4.0).round() / 4.0);
-                        } else {
-                            warn!("Could not parse pressure from {}", payload);
                         }
-
                         if let Ok(result) = b.trim().parse::<f64>() {
                             BATTERY_LEVEL.with_label_values(&[mac]).set(result);
-                        } else {
-                            warn!("Could not parse bat_lvl from {}", payload);
                         }
-
                         if let Ok(result) = epoch.trim().parse::<f64>() {
                             EPOCH.with_label_values(&[mac]).set(result);
-                        } else {
-                            warn!("Could not parse epoch from {}", payload);
                         }
-
                         if let Ok(result) = success.trim().parse::<f64>() {
                             MEASUREMENT_SUCCESS.with_label_values(&[mac]).set(result);
-                        } else {
-                            warn!("Could not parse success count from {}", payload);
                         }
-
                         if let Ok(result) = failure.trim().parse::<f64>() {
                             MEASUREMENT_FAILURE.with_label_values(&[mac]).set(result);
-                        } else {
-                            warn!("Could not parse failure count from {}", payload);
                         }
                     } else {
                         warn!("Could not split payload from {}", payload);
                     }
                 }
-                Ok(other) => {
-                    debug!("Received non-publish event: {:?}", other);
+                Ok(_other) => {
+                    // Ignore non-publish events (pings, acks, etc) to prevent log flooding
                 }
                 Err(e) => {
-                    error!("Connection error: {:?}", e);
-                    // Sleep to prevent tight CPU loop during broker downtime
-                    thread::sleep(std::time::Duration::from_secs(1));
+                    error!("MQTT connection error: {:?}", e);
+                    // Crucial: Sleep on error to prevent spinning during broker outage
+                    thread::sleep(std::time::Duration::from_secs(2));
                 }
             }
         }
     });
 
+    // --- TCP Server (Prometheus Scrape Endpoint) ---
     let listener = TcpListener::bind(bind_address).unwrap();
-
     info!("Starting server...");
 
     for stream in listener.incoming() {
-        debug!("Request received");
-        let mut stream: TcpStream = stream.unwrap();
+        let mut stream = match stream {
+            Ok(s) => s,
+            Err(e) => {
+                error!("TCP incoming stream connection error: {:?}", e);
+                thread::sleep(std::time::Duration::from_millis(50)); // Prevent hot loop if OS runs out of FDs
+                continue;
+            }
+        };
 
+        debug!("Request received");
         let mut req = [0; 1024];
 
-        stream.read(&mut req).unwrap();
-
-        debug!("req: {}", String::from_utf8_lossy(&req[..]));
+        // Read from stream defensively
+        match stream.read(&mut req) {
+            Ok(0) => {
+                // Client connected and immediately closed (EOF)
+                debug!("Client closed connection immediately (0 bytes read)");
+                continue;
+            }
+            Ok(n) => {
+                debug!("Read {} bytes", n);
+            }
+            Err(e) => {
+                warn!("Failed to read from TCP stream: {:?}", e);
+                continue;
+            }
+        }
 
         let mut buffer = vec![];
         let encoder = TextEncoder::new();
@@ -153,12 +170,14 @@ fn main() {
         encoder.encode(&metric_families, &mut buffer).unwrap();
 
         let res = format!(
-            "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
+            "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
             buffer.len(),
             str::from_utf8(&buffer).unwrap()
         );
 
-        stream.write(res.as_bytes()).unwrap();
-        stream.flush().unwrap();
+        if let Err(e) = stream.write_all(res.as_bytes()) {
+            warn!("Failed to write TCP response: {:?}", e);
+        }
+        let _ = stream.flush();
     }
 }
